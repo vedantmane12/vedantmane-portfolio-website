@@ -145,19 +145,17 @@ Copy `.env.example` to `.env.local` and set `RESEND_API_KEY` and
 email address, rather than pretending to send. That is deliberate: a silent
 success would lose real messages.
 
-Two emails go out per submission, as **separate requests**:
+One message goes out per submission, to `CONTACT_TO_EMAIL`. `reply_to` is set
+to the visitor's address, so replying from the inbox reaches them directly.
 
-1. The enquiry, to the site owner. This one decides whether the form reports
-   success.
-2. A courtesy copy back to whoever filled the form, best effort. Its failure is
-   logged and swallowed.
-
-Keep them separate. An earlier version put both addresses in a single `to`
-array, which meant Resend rejecting the copy discarded the enquiry along with
-it. On the shared `onboarding@resend.dev` sender Resend refuses every recipient
-except the account owner, so in that configuration every real visitor's message
-failed outright. Verifying a domain in Resend and moving `CONTACT_FROM_EMAIL`
-onto it enables the copies, with no code change.
+The visitor is deliberately **not** copied. Doing that requires Resend to accept
+a recipient other than the account owner, which requires a DNS-verified sending
+domain, which requires owning a domain. A `.vercel.app` hostname sits in
+Vercel's DNS zone and cannot take the records, so there is no way to enable it
+on the free setup. Two earlier attempts are worth not repeating: putting both
+addresses in one `to` array made Resend reject the whole message and lose the
+enquiry with it, and splitting it into two requests just meant the second one
+always failed.
 
 ## SEO
 

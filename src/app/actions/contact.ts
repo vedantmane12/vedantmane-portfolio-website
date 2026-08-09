@@ -75,8 +75,15 @@ export async function submitContact(
     values.body,
   ].join("\n");
 
-  const send = (recipients: string[], text: string) =>
-    fetch("https://api.resend.com/emails", {
+  // One message, to the inbox, and nothing else.
+  //
+  // Earlier versions also copied the visitor. That needs Resend to accept a
+  // recipient other than the account owner, which needs a DNS-verified sending
+  // domain, which needs a domain: vercel.app is Vercel's zone and cannot take
+  // the records. `reply_to` carries the visitor's address, so replying still
+  // reaches them directly from the inbox.
+  try {
+    const response = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
@@ -84,44 +91,12 @@ export async function submitContact(
       },
       body: JSON.stringify({
         from,
-        to: recipients,
+        to: [to],
         reply_to: values.email,
         subject,
-        text,
+        text: details,
       }),
     });
-
-  /**
-   * Resend's shared sender only delivers to the address that owns the account,
-   * and rejects the whole message if any other recipient is named. That is the
-   * one thing deciding the shape below, and it stops applying the moment
-   * CONTACT_FROM_EMAIL moves onto a domain verified at resend.com/domains.
-   *
-   * Off the shared sender, both parties go on one message: one thread, one
-   * subject, the visitor able to see they were included.
-   *
-   * On it, they cannot. A single message naming the visitor is refused
-   * outright and the enquiry is lost along with the copy, so the enquiry is
-   * sent alone and the copy follows as a separate, expendable request.
-   */
-  const onSharedSender = from.trim().toLowerCase().endsWith("@resend.dev");
-  const senderWantsCopy = values.email.toLowerCase() !== to.toLowerCase();
-  const together = senderWantsCopy && !onSharedSender;
-
-  try {
-    const response = await send(
-      together ? [to, values.email] : [to],
-      together
-        ? [
-            details,
-            "",
-            "--",
-            // The one message is read from both ends, so the footer has to
-            // make sense to either reader.
-            `Sent from the contact form on ${person.name}'s site. Both of you are on this message.`,
-          ].join("\n")
-        : details,
-    );
 
     if (!response.ok) {
       const detail = await response.text();
@@ -139,35 +114,6 @@ export async function submitContact(
       message: `Couldn't reach the mail service. Please email me at ${person.email}.`,
       values,
     };
-  }
-
-  // Only reached while on the shared sender, where the visitor could not be
-  // named on the message above. Deliberately best effort: Resend rejects this
-  // for every address but the account owner's, and a copy that cannot be
-  // delivered is no reason to tell someone their enquiry failed when it has
-  // already been delivered.
-  if (senderWantsCopy && !together) {
-    try {
-      const copy = await send(
-        [values.email],
-        [
-          `Thanks for getting in touch. ${person.name} has received this and will reply soon.`,
-          "",
-          "Your message:",
-          "",
-          details,
-        ].join("\n"),
-      );
-      if (!copy.ok) {
-        console.warn(
-          "[contact] Sender copy not delivered (the enquiry itself was sent):",
-          copy.status,
-          await copy.text(),
-        );
-      }
-    } catch (error) {
-      console.warn("[contact] Sender copy failed (the enquiry itself was sent):", error);
-    }
   }
 
   return {
