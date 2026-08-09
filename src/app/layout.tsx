@@ -190,16 +190,28 @@ function StructuredData() {
         inLanguage: "en-US",
         publisher: { "@id": `${SITE_URL}/#person` },
       },
-      ...projects
-        .filter((p) => p.featured)
-        .map((project) => ({
-          "@type": "CreativeWork",
+      // One ItemList covering every project, rather than three loose
+      // CreativeWork nodes for the featured ones. Two things changed with it.
+      // The list is a collection Google can understand as a set, and each entry
+      // points at that project's own page here: the old nodes linked straight
+      // out to GitHub, which described the work but sent every signal to a
+      // different domain. The @id on each item matches the SoftwareSourceCode
+      // node on the detail page, so the two describe one entity rather than two.
+      {
+        "@type": "ItemList",
+        "@id": `${SITE_URL}/#projects`,
+        name: "Projects",
+        description: `Data engineering, analytics and AI systems built by ${person.name}.`,
+        numberOfItems: projects.length,
+        itemListOrder: "https://schema.org/ItemListOrderAscending",
+        itemListElement: projects.map((project, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
           name: project.title,
-          description: project.blurb,
-          url: project.href ?? project.repo ?? `${SITE_URL}/#work`,
-          author: { "@id": `${SITE_URL}/#person` },
-          keywords: project.stack.join(", "),
+          url: `${SITE_URL}/projects/${project.slug}`,
+          item: { "@id": `${SITE_URL}/projects/${project.slug}#project` },
         })),
+      },
     ],
   };
 

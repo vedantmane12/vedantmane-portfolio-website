@@ -39,12 +39,24 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   return {
     title: project.title,
     description: project.blurb,
+    // Reusing the project's own stack as page-level keywords, so each page
+    // carries its own terms rather than the site-wide list from the layout.
+    keywords: [project.title, project.discipline, ...project.stack],
     alternates: { canonical: path },
     openGraph: {
       title,
       description: project.blurb,
       url: `${SITE_URL}${path}`,
       type: "article",
+      siteName: `${person.name} Portfolio`,
+    },
+    // Without this the layout's site-wide card wins, and every project shared
+    // on X or Slack previewed with the same generic title and description as
+    // the home page.
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description: project.blurb,
     },
   };
 }
@@ -58,15 +70,45 @@ export default async function ProjectPage({ params }: Params) {
   const index = projects.findIndex((p) => p.slug === slug);
   const next = projects[(index + 1) % projects.length];
 
+  const pageUrl = `${SITE_URL}/projects/${project.slug}`;
+
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "SoftwareSourceCode",
-    name: project.title,
-    description: project.blurb,
-    url: `${SITE_URL}/projects/${project.slug}`,
-    codeRepository: project.repo,
-    programmingLanguage: project.stack,
-    author: { "@type": "Person", name: person.name, url: SITE_URL },
+    "@graph": [
+      {
+        "@type": "SoftwareSourceCode",
+        "@id": `${pageUrl}#project`,
+        name: project.title,
+        headline: project.title,
+        description: project.blurb,
+        abstract: project.description,
+        url: pageUrl,
+        codeRepository: project.repo,
+        programmingLanguage: project.stack,
+        keywords: [project.discipline, ...project.stack].join(", "),
+        image: `${SITE_URL}${projectImageSrc(project.slug)}`,
+        author: { "@type": "Person", name: person.name, url: SITE_URL },
+        // Slash before the fragment, matching the WebSite node's own @id in
+        // the layout graph. Without it the reference points at nothing.
+        isPartOf: { "@id": `${SITE_URL}/#website` },
+      },
+      // Lets Google render "Home > Projects > This project" in the result
+      // instead of a bare URL, and ties each page back to the site root.
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${pageUrl}#breadcrumb`,
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Projects",
+            item: `${SITE_URL}/#projects`,
+          },
+          { "@type": "ListItem", position: 3, name: project.title },
+        ],
+      },
+    ],
   };
 
   return (
