@@ -106,8 +106,15 @@ export const metadata: Metadata = {
     },
   },
   category: "technology",
-  // TODO: paste the token from Google Search Console once the domain is live.
-  // verification: { google: "..." },
+  // Emits <meta name="google-site-verification" ...>, which is how a Search
+  // Console *URL prefix* property is verified. The DNS TXT method belongs to a
+  // Domain property and is not available on vedantmane.vercel.app: that
+  // hostname sits under Vercel's domain, so there is no DNS zone to add a
+  // record to. Public by design, it identifies the property rather than
+  // granting access to it.
+  verification: {
+    google: "JxAzj5ofjffgA4_dkfz58I2Dgk6fDvDnKFGhxTIl6W0",
+  },
 };
 
 export const viewport: Viewport = {
