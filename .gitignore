@@ -30,8 +30,10 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files. Real values stay local; the template is deliberately committed so
+# the required variables are discoverable when setting the project up on Vercel.
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -39,3 +41,13 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# iCloud sync duplicates. ~/Desktop is synced, and conflicts land as "name 2.ext"
+# alongside the original. They break tsc when they appear under .next/types, and
+# a stale "nav 2.tsx" once shipped a component two versions behind.
+*\ [0-9].*
+*\ [0-9]/
+
+# Machine-local Claude Code permissions. launch.json is shared project config
+# and stays tracked.
+.claude/settings.local.json

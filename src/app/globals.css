@@ -1,26 +1,235 @@
 @import "tailwindcss";
 
+/* Class-based dark mode so the theme toggle can override the OS preference. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fbfbf9;
+  --surface: #ffffff;
+  --surface-raised: #f4f4f1;
+  --foreground: #111113;
+  --muted: #63636b;
+  --subtle: #8e8e98;
+  --border: #e4e3de;
+  --accent: #3355ff;
+  --accent-foreground: #ffffff;
+  --glow: rgba(51, 85, 255, 0.16);
+  /* Attention colour, deliberately outside the blue accent family so it reads
+     as a separate signal. Fluorescent lime only works on the dark canvas; on
+     white it has to be deepened to stay legible at small sizes. */
+  --highlight: #4a6100;
+  /* Availability indicator. Deliberately outside both the blue accent and the
+     lime highlight, so "available" reads as its own signal rather than as more
+     brand colour. Deepened here to stay legible on the light canvas. */
+  --positive: #15803d;
+  /* Bright end of the glint that travels through the headline's accent words.
+     Light mode moves away from white rather than toward it, so the letterforms
+     never wash out against the page. */
+  --accent-glint: #7f95ff;
+  /* Grid cell size. The background tile and the pulsing cells drawn over it
+     both read from this, since a mismatch makes the pulses drift off the
+     lines they are meant to sit between. */
+  --grid-cell: 4rem;
+}
+
+.dark {
+  --background: #08090b;
+  --surface: #101116;
+  --surface-raised: #16171d;
+  --foreground: #f1f1f2;
+  --muted: #9a9aa4;
+  --subtle: #6e6e78;
+  --border: #212229;
+  --accent: #8ba4ff;
+  --accent-foreground: #08090b;
+  --glow: rgba(139, 164, 255, 0.14);
+  --highlight: #ccff00;
+  --positive: #4ade80;
+  --accent-glint: #e2e8ff;
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-muted: var(--muted);
+  --color-subtle: var(--subtle);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-highlight: var(--highlight);
+  --color-positive: var(--positive);
+
+  /* Loaded and self-hosted by next/font in app/layout.tsx. The fallbacks after
+     each variable keep the page readable if a font file ever fails to load. */
+  --font-sans: var(--font-manrope), ui-sans-serif, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-display: var(--font-instrument-serif), ui-serif, "New York", Georgia,
+    serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, "SF Mono", Menlo,
+    monospace;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    /* Lenis drives scrolling; native smooth scroll would fight it. */
+    scroll-behavior: auto;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    /* Never let the browser fake a weight; SF has real ones. */
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Apple sets numerals in headings and data to a fixed width so figures line
+     up between rows. Applied to the mono face, which carries dates and stats. */
+  .font-mono {
+    font-variant-numeric: tabular-nums;
+  }
+
+  ::selection {
+    background: var(--accent);
+    color: var(--accent-foreground);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  /* Lenis requirement: the wrapper must not clip its own scroll. */
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .text-pretty {
+    text-wrap: pretty;
+  }
+
+  /* Section shell, one consistent horizontal rhythm across the whole page. */
+  .container-page {
+    width: 100%;
+    max-width: 72rem;
+    margin-inline: auto;
+    padding-inline: 1.5rem;
+  }
+
+  @media (min-width: 1024px) {
+    .container-page {
+      padding-inline: 3rem;
+    }
+  }
+
+  .hairline {
+    border-top: 1px solid var(--border);
+  }
+
+  /* Ambient background wash behind the hero. */
+  .glow-field {
+    background:
+      radial-gradient(60rem 40rem at 15% -10%, var(--glow), transparent 60%),
+      radial-gradient(45rem 35rem at 85% 5%, var(--glow), transparent 55%);
+  }
+
+  /* Film grain. Breaks up the large flat areas of the hero so the gradients
+     don't band on wide displays, and takes the plastic sheen off the dark
+     canvas. Generated rather than a bitmap, so it costs nothing to ship. */
+  .grain {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23g)'/%3E%3C/svg%3E");
+  }
+
+  /* The grid is split into lines and mask so GridField can drop pulsing cells
+     between the lines and have them inherit exactly the same fade. */
+  .grid-lines {
+    background-image:
+      linear-gradient(to right, var(--border) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--border) 1px, transparent 1px);
+    background-size: var(--grid-cell) var(--grid-cell);
+  }
+
+  .grid-mask {
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, #000 20%, transparent 75%);
+  }
+
+  /* A slow glint travelling through the headline's accent words. The gradient
+     is far wider than the text, so only a slice of the bright stop is ever on
+     screen: it reads as light crossing the letterforms rather than the colour
+     changing. Applied only when motion is allowed, since freezing this
+     mid-sweep would leave the words an arbitrary shade. See TextReveal. */
+  .text-accent-sheen {
+    background-image: linear-gradient(
+      100deg,
+      var(--accent) 0%,
+      var(--accent) 38%,
+      var(--accent-glint) 50%,
+      var(--accent) 62%,
+      var(--accent) 100%
+    );
+    background-size: 260% 100%;
+    /* Both ends of the gradient are the same colour, so tiling is seamless and
+       the text can never be left with an unpainted, and therefore invisible,
+       run of letters. */
+    background-repeat: repeat-x;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: accent-sheen 7s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  }
+}
+
+/* Held at each end for part of the cycle so the glint reads as an event rather
+   than a constant shimmer.
+ *
+ * Percentages stay inside 0 to 100. A background-position percentage resolves
+ * against (container width - image width), which is negative here because the
+ * image is wider than the box, so values outside that range slide the gradient
+ * clear of the text entirely. At 100% the bright stop sits just off the left
+ * edge and at 0% just off the right, which is the full sweep, left to right.
+ */
+@keyframes accent-sheen {
+  0%,
+  14% {
+    background-position: 100% 0;
+  }
+  64%,
+  100% {
+    background-position: 0% 0;
+  }
+}
+
+/* Respect the OS setting: kill transforms and transitions, keep content visible. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
