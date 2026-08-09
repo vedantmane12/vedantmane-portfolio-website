@@ -12,9 +12,28 @@
  *      "taught through". State the capability, not the timeline.
  */
 
-export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
-  "https://vedantmane.com";
+/**
+ * The origin every canonical, Open Graph URL, sitemap entry and JSON-LD @id is
+ * built from. Only ever read on the server.
+ *
+ * Resolution order matters. The first deploy pointed all of it at
+ * vedantmane.com, a domain that does not exist, which is worse than pointing at
+ * nothing: canonicals name a dead page as the real one, and social previews
+ * fetch an og:image URL that 404s.
+ *
+ *   1. NEXT_PUBLIC_SITE_URL, an explicit override for when a real domain lands.
+ *   2. VERCEL_PROJECT_PRODUCTION_URL, which Vercel sets to the project's
+ *      production domain. It follows a custom domain automatically once one is
+ *      attached, and stays pointed at production on preview deployments, so
+ *      previews never claim a canonical of their own.
+ *   3. localhost, for `next dev` and local builds.
+ */
+const vercelProduction = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+
+export const SITE_URL = (
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (vercelProduction ? `https://${vercelProduction}` : "http://localhost:3000")
+).replace(/\/$/, "");
 
 export type Social = {
   label: string;
