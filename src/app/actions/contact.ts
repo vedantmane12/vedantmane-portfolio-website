@@ -75,7 +75,7 @@ export async function submitContact(
     values.body,
   ].join("\n");
 
-  const send = (recipient: string, text: string) =>
+  const send = (recipients: string[], text: string) =>
     fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -84,21 +84,44 @@ export async function submitContact(
       },
       body: JSON.stringify({
         from,
-        to: [recipient],
+        to: recipients,
         reply_to: values.email,
         subject,
         text,
       }),
     });
 
+  /**
+   * Resend's shared sender only delivers to the address that owns the account,
+   * and rejects the whole message if any other recipient is named. That is the
+   * one thing deciding the shape below, and it stops applying the moment
+   * CONTACT_FROM_EMAIL moves onto a domain verified at resend.com/domains.
+   *
+   * Off the shared sender, both parties go on one message: one thread, one
+   * subject, the visitor able to see they were included.
+   *
+   * On it, they cannot. A single message naming the visitor is refused
+   * outright and the enquiry is lost along with the copy, so the enquiry is
+   * sent alone and the copy follows as a separate, expendable request.
+   */
+  const onSharedSender = from.trim().toLowerCase().endsWith("@resend.dev");
+  const senderWantsCopy = values.email.toLowerCase() !== to.toLowerCase();
+  const together = senderWantsCopy && !onSharedSender;
+
   try {
-    // The enquiry itself, sent on its own. An earlier version put both
-    // addresses in one message, which meant Resend rejecting the sender's copy
-    // threw away the enquiry with it: on the shared testing sender it refuses
-    // any recipient other than the account owner, so every real visitor's
-    // message failed outright. The two are separate requests now, and this one
-    // decides whether the form reports success.
-    const response = await send(to, details);
+    const response = await send(
+      together ? [to, values.email] : [to],
+      together
+        ? [
+            details,
+            "",
+            "--",
+            // The one message is read from both ends, so the footer has to
+            // make sense to either reader.
+            `Sent from the contact form on ${person.name}'s site. Both of you are on this message.`,
+          ].join("\n")
+        : details,
+    );
 
     if (!response.ok) {
       const detail = await response.text();
@@ -118,15 +141,15 @@ export async function submitContact(
     };
   }
 
-  // Courtesy copy back to whoever filled the form, so they have a record of
-  // what they sent. Deliberately best effort: until a domain is verified in
-  // Resend this is rejected for every address but the account owner's, and a
-  // copy that cannot be delivered is not a reason to tell someone their
-  // enquiry failed when it has already been delivered above.
-  if (values.email.toLowerCase() !== to.toLowerCase()) {
+  // Only reached while on the shared sender, where the visitor could not be
+  // named on the message above. Deliberately best effort: Resend rejects this
+  // for every address but the account owner's, and a copy that cannot be
+  // delivered is no reason to tell someone their enquiry failed when it has
+  // already been delivered.
+  if (senderWantsCopy && !together) {
     try {
       const copy = await send(
-        values.email,
+        [values.email],
         [
           `Thanks for getting in touch. ${person.name} has received this and will reply soon.`,
           "",
