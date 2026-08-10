@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Instrument_Serif, JetBrains_Mono, Manrope } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { SmoothScroll } from "@/components/providers/smooth-scroll";
 import { themeInitScript } from "@/components/providers/theme-toggle";
 import {
@@ -261,6 +262,10 @@ export default function RootLayout({
           Skip to content
         </a>
         <SmoothScroll>{children}</SmoothScroll>
+        {/* Vercel Web Analytics. Cookieless and without personal identifiers,
+            so it needs no consent banner. Renders nothing and only injects its
+            script on Vercel, so local development is unaffected. */}
+        <Analytics />
       </body>
     </html>
   );
