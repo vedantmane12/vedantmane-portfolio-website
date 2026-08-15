@@ -1097,6 +1097,28 @@ export const projects: Project[] = [
     featured: false,
   },
   {
+    slug: "financial-report-agent",
+    title: "Financial Report Analyzer",
+    discipline: "AI Systems",
+    cardLine: "Filings, live prices and news in one answer.",
+    blurb:
+      "An agent that routes between quarterly filings, live market data and current news, deciding after every step which of the three a question still needs.",
+    description:
+      "Quarterly earnings reports for 2023 through 2025 are read with Mistral OCR, chunked against the embedding model's own tokenizer, and stored in Pinecone keyed by company, year and quarter. A LangGraph oracle then sits in front of four tools: the vector store for what a filing said, web search for what has happened since, a market data tool computing price change, volatility, high and low over a range, and a final answer that closes the loop. Every tool edge returns to the oracle, so a question needing both a filing and a live price gets both without either being hardcoded.",
+    outcome:
+      "4 tools behind one routing loop, over 12 indexed quarters per company",
+    stack: [
+      "LangGraph",
+      "Pinecone",
+      "Mistral OCR",
+      "FastAPI",
+      "Streamlit",
+      "yfinance",
+    ],
+    repo: "https://github.com/vedantmane12/financial-report-analyzer",
+    featured: false,
+  },
+  {
     slug: "lora-peft-finetuning",
     title: "LoRA / PEFT Fine-Tuning",
     discipline: "Machine Learning",
@@ -1116,6 +1138,50 @@ export const projects: Project[] = [
       "Responsible AI",
     ],
     repo: "https://github.com/vedantmane12/LLM-FineTuning",
+    featured: false,
+  },
+  {
+    slug: "mental-wellness-rl",
+    title: "Mental Wellness Companion",
+    discipline: "Machine Learning",
+    cardLine: "Trained on simulated people, never on patients.",
+    blurb:
+      "A reinforcement learning agent that learns which conversational strategy, resource and tone to use next, trained entirely against generated personas so no real patient data is involved.",
+    description:
+      "Two learners run side by side because the feedback differs. PPO handles the conversation policy, where reward only resolves at the end of an episode, and Thompson sampling over Beta-distributed arms handles resource recommendation, where each choice gets its own immediate signal. The policy reads a 256-dimension state built from five emotional dimensions, the last five turns and engagement and timing signals, then emits nineteen logits covering eight strategies, six resource types and five tones. A separate monitor screens every inbound message and outbound response, and the ablation shows why it cannot be a tunable weight.",
+    outcome:
+      "0 safety violations across 476 training episodes, with 79% engagement",
+    stack: [
+      "PyTorch",
+      "PPO",
+      "Thompson Sampling",
+      "Multi-Agent Systems",
+      "Responsible AI",
+      "FastAPI",
+    ],
+    repo: "https://github.com/vedantmane12/mental-wellness-companion",
+    featured: false,
+  },
+  {
+    slug: "atari-kaboom-dqn",
+    title: "Deep Q-Learning on Atari Kaboom",
+    discipline: "Machine Learning",
+    cardLine: "Every hyperparameter tested, none assumed.",
+    blurb:
+      "A CNN Q-network learning Atari Kaboom from raw pixels, where the interesting part is the experiment matrix around it rather than the agent itself.",
+    description:
+      "An 11.6 million parameter convolutional network maps a 210 by 160 RGB frame to four action values, trained with experience replay and a separate target network so the bootstrapped target does not drift with the weights being fitted. A random agent is measured first, at 3.45, and every later figure is quoted against it. Learning rate, discount factor, exploration policy and three decay schedules are then varied one at a time, and every run's scores are committed as JSON next to the notebook rather than summarised in prose.",
+    outcome:
+      "10.85 mean score against a 3.45 random baseline, a 214% improvement",
+    stack: [
+      "TensorFlow",
+      "Deep Q-Networks",
+      "Gymnasium",
+      "Experience Replay",
+      "Reinforcement Learning",
+      "NumPy",
+    ],
+    repo: "https://github.com/vedantmane12/Atari-Kaboom-Deep-QLearning",
     featured: false,
   },
   {

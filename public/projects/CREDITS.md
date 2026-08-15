@@ -16,6 +16,9 @@ License: https://unsplash.com/license
 - `chinook-azure-snowflake.jpg` · record store racks · https://unsplash.com/photos/1569823035625-1af6550f37d4
 - `seattle-pet-license.jpg` · dog on a leash · https://unsplash.com/photos/1580129518863-f00fcf1d6e68
 - `web-pdf-extraction.jpg` · stacks of paper documents · https://unsplash.com/photos/1583521214690-73421a1829a9
+- `financial-report-agent.jpg` · open report with charts · https://unsplash.com/photos/1759215524566-8aea4761a926
+- `mental-wellness-rl.jpg` · sunlight through a window · https://unsplash.com/photos/1631832293782-2eda7804489b
+- `atari-kaboom-dqn.jpg` · arcade cabinets in neon · https://unsplash.com/photos/1696360172919-f7fdaaa78a92
 - `orchestrate-event-db.jpg` · conference event stage · https://unsplash.com/photos/1587825140708-dfaf72ae4b04
 - `fred-economic-data.jpg` · economic charts and figures · https://unsplash.com/photos/1590283603385-17ffb3a7f29f
 - `academic-research-assistant.jpg` · library research shelves · https://unsplash.com/photos/1521587760476-6c12a4b040da

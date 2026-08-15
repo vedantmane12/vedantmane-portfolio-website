@@ -407,6 +407,88 @@ export const projectDetails: Record<string, ProjectDetail> = {
     links: [{ label: "Live app", href: "https://nvidia-finrag.streamlit.app/" }],
   },
 
+  "financial-report-agent": {
+    problem:
+      "A question about a company rarely sits in one source. What the last filing said is in a PDF, what the market thinks is in today's price, and what changed this week is in the news. Answering from any one of them alone gives a confident answer built on a partial picture. This puts all three behind a single agent and lets it decide, after every step, which one the question still needs.",
+    stages: [
+      {
+        name: "Read the filings",
+        detail:
+          "Quarterly earnings reports are collected per company across 2023, 2024 and 2025, and converted with Mistral OCR, since a scanned report yields nothing useful to an embedding model without it. The markdown that comes out is what everything downstream works on.",
+      },
+      {
+        name: "Chunk against the tokenizer",
+        detail:
+          "Text is grouped into semantic chunks, then measured with tiktoken using the embedding model's own encoding. Anything over the limit is split by tokens rather than characters, so a chunk is never silently truncated at embed time. Vectors are upserted to Pinecone keyed by company, year and quarter, which is what makes a filtered question possible later.",
+      },
+      {
+        name: "Put an oracle in front",
+        detail:
+          "A LangGraph state graph holds one oracle node that decides what to do next, and four tools it can call. Every tool edge routes back to the oracle rather than onward to the next tool, so the graph loops instead of running a fixed pipeline, and the number of steps is set by the question rather than by the wiring.",
+      },
+      {
+        name: "Four tools, four different questions",
+        detail:
+          "Vector search answers what a filing said. Web search covers what has happened since. The market tool pulls a price history for a date range and computes change, percentage move, volatility, high and low. The fourth tool is the final answer, which is how the loop terminates rather than running until it hits a step limit.",
+      },
+      {
+        name: "Serve it, and let the caller narrow it",
+        detail:
+          "A FastAPI service exposes health, analyze, options, sample queries and a per-tool test endpoint. The Streamlit interface reads the options endpoint to offer year, quarter and company filters plus a choice of which tools are permitted, so the search space can be cut before the agent starts rather than after.",
+      },
+    ],
+    decisions: [
+      {
+        title: "Every tool returns to the oracle",
+        detail:
+          "The alternative is a pipeline: retrieve, then search, then summarise. That works until a question needs the market data before it knows which filing matters, at which point a fixed order is wrong. Routing every tool back to the oracle costs an extra decision per step and buys the ability to answer questions the graph was never explicitly designed for.",
+      },
+      {
+        title: "A test endpoint per tool",
+        detail:
+          "Agent loops fail in a specific way: the answer is wrong and it is not obvious which leg produced it. Exposing the tools individually means a suspect tool can be exercised on its own with a known input, so debugging is a single call rather than a full run followed by inference about what went wrong inside it.",
+      },
+      {
+        title: "Token budgets, not character counts",
+        detail:
+          "Chunking on characters is the common shortcut and it fails at the boundary: a chunk that looks fine is rejected or silently cut by the embedding model. Counting with the tokenizer that model actually uses means the split happens where the limit really is, and the sub-chunks that come out are all embeddable by construction.",
+      },
+    ],
+    results: [
+      {
+        metric: "4",
+        label: "Tools the agent routes between, each returning to the oracle",
+      },
+      { metric: "12", label: "Quarters indexed per company, 2023 through 2025" },
+      { metric: "3", label: "Sources reconciled: filings, market data, and news" },
+      { metric: "5", label: "API endpoints, with every tool testable on its own" },
+    ],
+    diagram: {
+      caption:
+        "The loop is the point. Every tool edge returns to the oracle rather than continuing to the next tool, so the number of steps is decided by the question rather than fixed by the graph.",
+      lanes: ["Source", "Extract", "Store", "Agent", "Serve"],
+      nodes: [
+        { id: "filings", label: "Quarterly\nfilings", col: 0, row: 0, kind: "source", note: "2023 to 2025" },
+        { id: "ocr", label: "Mistral OCR", col: 1, row: 0, kind: "process", note: "pdf to markdown" },
+        { id: "chunks", label: "Semantic chunks", col: 1, row: 1, kind: "process", note: "tiktoken budget" },
+        { id: "pine", label: "Pinecone", col: 2, row: 0, kind: "store", note: "year, quarter" },
+        { id: "oracle", label: "Oracle", col: 3, row: 0, kind: "process", note: "decides each step" },
+        { id: "tools", label: "4 tools", col: 3, row: 1, kind: "model", note: "back to oracle" },
+        { id: "live", label: "Market + news", col: 3, row: 2, kind: "source", note: "yfinance, serpapi" },
+        { id: "api", label: "FastAPI", col: 4, row: 0, kind: "serve", note: "5 endpoints" },
+      ],
+      edges: [
+        { from: "filings", to: "ocr" },
+        { from: "ocr", to: "chunks" },
+        { from: "chunks", to: "pine" },
+        { from: "pine", to: "oracle" },
+        { from: "oracle", to: "tools" },
+        { from: "live", to: "tools" },
+        { from: "tools", to: "api" },
+      ],
+    },
+  },
+
   "lora-peft-finetuning": {
     problem:
       "Fully fine-tuning a language model updates every weight, which needs hardware most people do not have and produces a checkpoint as large as the original model. This project adapts microsoft/DialoGPT-medium to a mental health question and answer domain by training a small fraction of it, on a single free Colab GPU, and ships the result as a file small enough to attach to an email.",
@@ -483,6 +565,174 @@ export const projectDetails: Record<string, ProjectDetail> = {
         { from: "lora", to: "train" },
         { from: "train", to: "eval" },
         { from: "eval", to: "out" },
+      ],
+    },
+  },
+
+  "mental-wellness-rl": {
+    problem:
+      "A support agent that learns from experience needs conversations to learn from, and in this domain those conversations are patient data. The way around it is to not use any: personas are generated from archetypes and a severity distribution, an LLM plays them turn by turn, and the policy trains against thousands of simulated conversations. That buys the training signal without the privacy problem, and it makes the safety layer non-optional rather than a feature, because an agent optimising a reward will happily find responses that score well and should never be said.",
+    stages: [
+      {
+        name: "Generate the people",
+        detail:
+          "A persona generator builds psychologically consistent users from a set of archetypes and a severity distribution, and an LLM then plays each one across a conversation. No real transcript is used at any point, which is the reason the project can exist as an open repository at all.",
+      },
+      {
+        name: "Describe the state",
+        detail:
+          "Each turn is compressed into a 256 dimension embedding: five emotional dimensions covering anxiety, depression, stress, anger and happiness, the previous five turns, three engagement signals, and two temporal features including how long it has been since the last contact.",
+      },
+      {
+        name: "Decide on three axes at once",
+        detail:
+          "The policy network runs 512, 256 and 128 hidden units and emits nineteen logits, which are read as three separate choices: one of eight conversation strategies, one of six resource types, and one of five response tones. A check-in time between one and 168 hours is chosen alongside them, so the agent decides not only what to say but when to come back.",
+      },
+      {
+        name: "Learn with two algorithms",
+        detail:
+          "PPO trains the conversation policy, clipping at 0.2 with an entropy bonus of 0.01, generalised advantage estimation and ten update epochs per batch. Resource recommendation instead runs Thompson sampling over Beta-distributed arms, sampling each arm's success probability rather than estimating a long-horizon return.",
+      },
+      {
+        name: "Score it, then override the score",
+        detail:
+          "Reward weights engagement at 0.4, mood improvement 0.3, resource use 0.2 and conversation quality 0.1, with a safety penalty of minus one and a crisis penalty of minus ten. Separately from the reward, a monitor screens every inbound message and outbound response for crisis keywords, harmful patterns and boundary violations, and appends crisis resources whenever risk crosses the referral threshold.",
+      },
+    ],
+    decisions: [
+      {
+        title: "Simulated users, by necessity and by design",
+        detail:
+          "Reinforcement learning needs far more conversations than any ethical collection process would yield here, and real ones would be among the most sensitive data there is. Generating personas and letting a language model play them removes the consent problem entirely. The cost is honest and worth stating: the agent is good at the simulated cohort it was trained against, which is not the same as being good with people.",
+      },
+      {
+        title: "Two learners, because the feedback differs",
+        detail:
+          "Conversation strategy pays off over a whole episode, so it needs a method that can assign credit backwards across turns, which is PPO. A resource recommendation gets its own immediate signal, so treating it the same way would spread one clear outcome across an entire conversation. Thompson sampling uses that signal where it lands, and the split follows the shape of the feedback rather than a preference for one algorithm.",
+      },
+      {
+        title: "Safety is not a weight in the reward",
+        detail:
+          "The ablation is the argument. Removing the safety layer barely moves engagement, 79% down to 75%, and takes the safety score from 100 to zero. Anything expressed as a reward term is by definition tradeable against the other terms, and those numbers show the trade is one an optimiser would happily make. It sits outside the objective, as a monitor that can override the policy's output.",
+      },
+    ],
+    results: [
+      { metric: "0", label: "Safety violations across 476 training episodes" },
+      { metric: "79%", label: "Engagement rate, a 75% improvement on the baseline" },
+      {
+        metric: "19",
+        label: "Action dimensions: 8 strategies, 6 resources, 5 tones",
+      },
+      { metric: "4", label: "Ablations: full, no PPO, no bandits, no safety" },
+    ],
+    diagram: {
+      caption:
+        "A closed training loop with no real user in it. The safety monitor sits between the policy and the reward deliberately, so it can override an action the objective would otherwise have rewarded.",
+      lanes: ["Simulate", "Observe", "Act", "Learn"],
+      nodes: [
+        { id: "persona", label: "Persona\ngenerator", col: 0, row: 0, kind: "source", note: "archetypes" },
+        { id: "user", label: "LLM user", col: 0, row: 1, kind: "source", note: "plays the persona" },
+        { id: "state", label: "256-d state", col: 1, row: 0, kind: "store", note: "mood, history" },
+        { id: "policy", label: "Policy network", col: 2, row: 0, kind: "model", note: "19 outputs" },
+        { id: "bandit", label: "Thompson bandit", col: 2, row: 1, kind: "model", note: "resources" },
+        { id: "safety", label: "Safety monitor", col: 2, row: 2, kind: "process", note: "can override" },
+        { id: "reward", label: "Reward", col: 3, row: 0, kind: "store", note: "4 terms, 2 penalties" },
+        { id: "ppo", label: "PPO update", col: 3, row: 1, kind: "process", note: "clip 0.2, GAE" },
+      ],
+      edges: [
+        { from: "persona", to: "user" },
+        { from: "user", to: "state" },
+        { from: "state", to: "policy" },
+        { from: "state", to: "bandit" },
+        { from: "policy", to: "safety" },
+        { from: "safety", to: "reward" },
+        { from: "bandit", to: "reward" },
+        { from: "reward", to: "ppo" },
+      ],
+    },
+    sourceNote:
+      "The engagement, mood and safety figures are the project's own evaluation against its simulated cohort, reported in the repository. They are not a clinical result and nothing here was trained on, or tested with, real patient data.",
+  },
+
+  "atari-kaboom-dqn": {
+    problem:
+      "Getting a Q-network to play an Atari game is a solved exercise, and a score on its own says very little: without knowing what random play scores, ten points could be excellent or barely better than nothing. This project treats that as the actual work. A baseline is measured first, then learning rate, discount, exploration policy and decay schedule are each varied on their own, and every run's raw scores are committed rather than summarised.",
+    stages: [
+      {
+        name: "Frame the problem honestly",
+        detail:
+          "Kaboom presents a 210 by 160 RGB frame and four discrete actions: no-op, fire, right and left. Inspecting the reward structure first showed no shaped reward to lean on, so the score is the only learning signal and the agent has to discover timing and positioning from it alone.",
+      },
+      {
+        name: "Measure random play",
+        detail:
+          "A random agent runs over the same episode budget and scores a mean of 3.45. That number comes before any training and is what every later figure is quoted against, which is the difference between reporting an improvement and reporting a score.",
+      },
+      {
+        name: "Build the network",
+        detail:
+          "A convolutional Q-network of 11.6 million parameters maps the raw frame to four action values. Experience replay breaks the correlation between consecutive frames, and a separate target network holds the bootstrap target still, so the value being regressed towards is not moving with the weights doing the regressing.",
+      },
+      {
+        name: "Vary one thing at a time",
+        detail:
+          "Learning rate is tested at 0.00025 and 0.001, discount at 0.99 and 0.8, exploration as epsilon-greedy against Boltzmann, and three epsilon decay schedules covering fast, slow and low-start. Each run changes a single variable, which is what makes the resulting difference attributable to it.",
+      },
+      {
+        name: "Commit the numbers",
+        detail:
+          "Ten result files land next to the notebook holding per-episode scores, the epsilon reached at the step limit, environment and architecture summaries, and the comparison tables. The claims on this page are read out of those files rather than from the write-up.",
+      },
+    ],
+    decisions: [
+      {
+        title: "Baseline before agent",
+        detail:
+          "Random play scoring 3.45 is the least interesting run and the most important one. Without it the trained agent's 10.85 is a number with nothing to compare against, and the temptation is to describe it as good. With it, the claim is 214% and it is checkable.",
+      },
+      {
+        title: "One variable per run, even when it is slow",
+        detail:
+          "Changing several settings at once and keeping whatever scores best produces a configuration nobody can explain. Isolating them costs more runs and yields attributable findings: raising the learning rate to 0.001 cost 24%, and dropping the discount to 0.8 cost 56%, which says the game's reward is far enough in the future that a short horizon cannot see it.",
+      },
+      {
+        title: "Report the experiment that lost",
+        detail:
+          "Boltzmann exploration scored 8.3 against epsilon-greedy's 8.95, about 7% behind. It stayed in the results rather than being quietly dropped. A comparison only means anything if the losing arm is still visible, and on this environment it is a genuine finding that the simpler policy won.",
+      },
+    ],
+    results: [
+      { metric: "214%", label: "Improvement over random play, 3.45 to 10.85" },
+      { metric: "11.6M", label: "Parameters in the convolutional Q-network" },
+      {
+        metric: "56%",
+        label: "Performance lost by dropping the discount to 0.8",
+      },
+      { metric: "10", label: "Result files committed alongside the notebook" },
+    ],
+    diagram: {
+      caption:
+        "The agent is the ordinary part. Replay and a separate target network keep training stable, and the experiment matrix on the right is what turns a single score into an attributable result.",
+      lanes: ["Environment", "Network", "Training", "Evidence"],
+      nodes: [
+        { id: "env", label: "Kaboom (ALE)", col: 0, row: 0, kind: "source", note: "210x160, 4 actions" },
+        { id: "random", label: "Random agent", col: 0, row: 1, kind: "process", note: "baseline 3.45" },
+        { id: "cnn", label: "CNN Q-network", col: 1, row: 0, kind: "model", note: "11.6M params" },
+        { id: "replay", label: "Replay buffer", col: 1, row: 1, kind: "store", note: "breaks correlation" },
+        { id: "target", label: "Target network", col: 2, row: 0, kind: "model", note: "stable bootstrap" },
+        { id: "explore", label: "Exploration", col: 2, row: 1, kind: "process", note: "greedy, boltzmann" },
+        { id: "runs", label: "Experiment matrix", col: 3, row: 0, kind: "process", note: "one variable each" },
+        { id: "json", label: "Result files", col: 3, row: 1, kind: "store", note: "raw scores" },
+      ],
+      edges: [
+        { from: "env", to: "cnn" },
+        { from: "random", to: "runs" },
+        { from: "cnn", to: "replay" },
+        { from: "replay", to: "target" },
+        { from: "cnn", to: "explore" },
+        { from: "target", to: "runs" },
+        { from: "explore", to: "runs" },
+        { from: "runs", to: "json" },
       ],
     },
   },
