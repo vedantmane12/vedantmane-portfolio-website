@@ -122,11 +122,14 @@ export default async function BlogPost({ params }: Params) {
                   aria-label="Breadcrumb"
                   className="font-mono text-[11px] uppercase tracking-[0.16em] text-muted"
                 >
+                  {/* Both rungs carry `py-2 -my-2`, which grows an 11px link's
+                      17px box to about 33px without shifting the row. WCAG 2.5.8
+                      wants 24px minimum, and these are the primary way back. */}
                   <ol className="flex flex-wrap items-center gap-x-3 gap-y-2">
                     <li>
                       <Link
                         href="/#projects"
-                        className="group inline-flex items-center gap-2 transition-colors duration-300 hover:text-accent"
+                        className="group -my-2 inline-flex items-center gap-2 py-2 transition-colors duration-300 hover:text-accent"
                       >
                         <span
                           aria-hidden="true"
@@ -143,7 +146,7 @@ export default async function BlogPost({ params }: Params) {
                     <li>
                       <Link
                         href="/blog"
-                        className="transition-colors duration-300 hover:text-accent"
+                        className="-my-2 inline-block py-2 transition-colors duration-300 hover:text-accent"
                       >
                         All writing
                       </Link>

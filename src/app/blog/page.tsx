@@ -77,9 +77,12 @@ export default function BlogIndex() {
                 sole affordance on a phone. Points at #projects rather than the
                 top because that is the section the visitor left to get here. */}
             <Reveal>
+              {/* `py-2 -my-2` grows the hit area to about 33px without moving
+                  anything: 11px type gives a 17px box, and WCAG 2.5.8 asks for
+                  24px minimum. The negative margin cancels the padding in flow. */}
               <Link
                 href="/#projects"
-                className="group inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.16em] text-muted transition-colors duration-300 hover:text-accent"
+                className="group -my-2 inline-flex items-center gap-2 py-2 font-mono text-[11px] uppercase tracking-[0.16em] text-muted transition-colors duration-300 hover:text-accent"
               >
                 <span
                   aria-hidden="true"
@@ -131,7 +134,9 @@ export default function BlogIndex() {
                         PROJECT_IMAGE_FILTER,
                       )}
                     />
-                    <div className={cn("absolute inset-0", PROJECT_IMAGE_WASH)} />
+                    <div
+                      className={cn("absolute inset-0", PROJECT_IMAGE_WASH)}
+                    />
                     <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
                   </div>
 
@@ -177,7 +182,9 @@ export default function BlogIndex() {
                           PROJECT_IMAGE_FILTER,
                         )}
                       />
-                      <div className={cn("absolute inset-0", PROJECT_IMAGE_WASH)} />
+                      <div
+                        className={cn("absolute inset-0", PROJECT_IMAGE_WASH)}
+                      />
                     </div>
 
                     <div className="min-w-0">

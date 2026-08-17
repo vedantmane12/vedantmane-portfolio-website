@@ -149,9 +149,12 @@ export default async function ProjectPage({ params }: Params) {
 
             <div className="container-page pb-14 sm:pb-16">
               <Reveal>
+                {/* Same 24px target floor as the writing pages. An 11px link is
+                    a 17px box, which is under WCAG 2.5.8, and the padding grows
+                    it without moving the headline below. */}
                 <Link
                   href="/#projects"
-                  className="group inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.16em] text-muted transition-colors duration-300 hover:text-accent"
+                  className="group -my-2 inline-flex items-center gap-2 py-2 font-mono text-[11px] uppercase tracking-[0.16em] text-muted transition-colors duration-300 hover:text-accent"
                 >
                   <span
                     aria-hidden="true"
