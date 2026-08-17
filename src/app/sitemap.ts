@@ -1,23 +1,29 @@
 import type { MetadataRoute } from "next";
-import { postsByDate } from "@/content/blog";
+import { CONTENT_REVISED, postsByDate } from "@/content/blog";
 import { projects, SITE_URL } from "@/content/site";
 import { projectImageSrc } from "@/lib/project-media";
 
 /**
- * Bumped by hand when the content actually changes.
+ * Three dates, bumped by hand, because these three groups of pages genuinely
+ * change at different times.
  *
  * `new Date()` was tempting and wrong: it stamps every URL with the build time,
  * so a redeploy that changed one line told crawlers all fourteen pages were
  * modified. Repeated often enough that teaches Google the dates mean nothing,
  * and it stops using them to prioritise recrawls.
+ *
+ * Collapsing them onto one constant is the same mistake more slowly. The home
+ * page copy changed with the last writing pass and the project pages did not, so
+ * they carry different dates. Bump the one that actually moved.
  */
-const CONTENT_UPDATED = new Date("2026-08-09");
+const HOME_UPDATED = new Date("2026-08-17");
+const PROJECTS_UPDATED = new Date("2026-08-09");
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
       url: SITE_URL,
-      lastModified: CONTENT_UPDATED,
+      lastModified: HOME_UPDATED,
       changeFrequency: "monthly",
       priority: 1,
     },
@@ -25,7 +31,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // the pages are, so the sitemap cannot fall behind the routes.
     ...projects.map((project) => ({
       url: `${SITE_URL}/projects/${project.slug}`,
-      lastModified: CONTENT_UPDATED,
+      lastModified: PROJECTS_UPDATED,
       changeFrequency: "yearly" as const,
       priority: project.featured ? 0.9 : 0.7,
       // Declaring the card photograph gives Google Images something to attach
@@ -36,15 +42,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })),
     {
       url: `${SITE_URL}/blog`,
-      lastModified: new Date(postsByDate[0].isoDate),
+      lastModified: new Date(CONTENT_REVISED),
       changeFrequency: "monthly",
       priority: 0.8,
     },
-    // Article dates come from the posts themselves rather than the build, so a
-    // redeploy does not tell crawlers that every piece was rewritten.
+    // `lastmod` is the revision date, not the publication date. It used to be
+    // `post.isoDate`, which is when the piece went up, so the sitemap claimed
+    // nothing had changed since January while all six had been rewritten. The
+    // JSON-LD keeps `datePublished` on the original date and takes
+    // `dateModified` from the same constant, so the two never disagree.
     ...postsByDate.map((post) => ({
       url: `${SITE_URL}/blog/${post.slug}`,
-      lastModified: new Date(post.isoDate),
+      lastModified: new Date(CONTENT_REVISED),
       changeFrequency: "yearly" as const,
       priority: 0.7,
       // The cover photograph plus every figure in the article. The figures are

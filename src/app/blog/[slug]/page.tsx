@@ -7,7 +7,7 @@ import { Footer } from "@/components/footer";
 import { Reveal } from "@/components/motion/reveal";
 import { ScrollProgress } from "@/components/motion/scroll-progress";
 import { Nav } from "@/components/nav";
-import { getPost, posts, postsByDate } from "@/content/blog";
+import { CONTENT_REVISED, getPost, posts, postsByDate } from "@/content/blog";
 import { person, SITE_URL } from "@/content/site";
 import { PROJECT_IMAGE_FILTER, PROJECT_IMAGE_WASH } from "@/lib/project-media";
 import { cn } from "@/lib/utils";
@@ -34,8 +34,12 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const title = `${post.title} | ${person.name}`;
 
   return {
-    title: post.title,
-    description: post.excerpt,
+    // Search gets the short keyword-led pair, because a result truncates at
+    // roughly 60 characters of title and 155 of description. Social gets the
+    // editorial title and the full excerpt, where the hook does more work than
+    // the keywords and neither is clipped.
+    title: post.seoTitle ?? post.title,
+    description: post.seoDescription ?? post.excerpt,
     keywords: [post.discipline, ...post.tags],
     authors: [{ name: person.name, url: SITE_URL }],
     alternates: { canonical: path },
@@ -93,7 +97,10 @@ export default async function BlogPost({ params }: Params) {
         wordCount: post.wordCount,
         timeRequired: `PT${post.readingMinutes}M`,
         datePublished: post.isoDate,
-        dateModified: post.isoDate,
+        // The revision date, not the publication date. These were the same
+        // value, which told Google the pieces had not been touched since they
+        // went up, while every one of them has since been rewritten.
+        dateModified: CONTENT_REVISED,
         image: `${SITE_URL}/blog/${post.slug}.jpg`,
         url: pageUrl,
         author: { "@id": `${SITE_URL}/#person` },

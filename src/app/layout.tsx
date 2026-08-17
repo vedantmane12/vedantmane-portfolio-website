@@ -47,7 +47,13 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 const title = `${person.name} | ${person.role}`;
-const description = `${person.name} is a Data Engineer and AI Developer in ${person.location} with 3+ years building production data platforms. Real-time ETL, dimensional warehousing on Databricks and Snowflake, and multi-agent AI systems with LangGraph and RAG.`;
+
+// Two lengths, because the two places this appears clip at different points. A
+// search snippet shows roughly 155 characters, so the version that went out at
+// 230 lost its last clause. A social card has room for the longer one, and the
+// extra detail is worth having where it will actually be read.
+const description = `${person.name} is a Data Engineer and AI Developer in ${person.location}. Real-time ETL and dimensional warehousing on Databricks and Snowflake, plus multi-agent AI with LangGraph.`;
+const socialDescription = `${person.name} is a Data Engineer and AI Developer in ${person.location} with 3+ years building production data platforms. Real-time ETL, dimensional warehousing on Databricks and Snowflake, and multi-agent AI systems with LangGraph and RAG.`;
 
 export const metadata: Metadata = {
   // Makes every relative URL below resolve against the real domain.
@@ -84,7 +90,7 @@ export const metadata: Metadata = {
     type: "profile",
     siteName: `${person.name} Portfolio`,
     title,
-    description,
+    description: socialDescription,
     url: SITE_URL,
     locale: "en_US",
     firstName: person.firstName,
@@ -93,7 +99,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title,
-    description,
+    description: socialDescription,
   },
   robots: {
     index: true,
@@ -144,6 +150,10 @@ function StructuredData() {
         // Not `bio`: the visible copy is deliberately generic, and crawlers
         // still need the concrete stack and scale nouns.
         description: person.seoDescription,
+        // Gives the entity a face to attach to. Without an image the Person node
+        // is the only one in the graph carrying no visual, which is the one
+        // place a knowledge panel would use one.
+        image: `${SITE_URL}/memoji.png`,
         email: `mailto:${person.email}`,
         // E.164, which is the form schema.org expects.
         telephone: person.phone.replace(/[^\d+]/g, ""),

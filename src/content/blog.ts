@@ -76,8 +76,21 @@ export type BlogSection = {
 export type BlogPost = {
   slug: string;
   title: string;
-  /** Shown on the card and as the meta description. */
+  /**
+   * Short, keyword-led title for the `<title>` tag only. The editorial titles
+   * run 62 to 102 characters once the name suffix is added, and a search result
+   * shows roughly 60, so the interesting half was being cut off. The full title
+   * still carries the H1 and the social card, where length is not the
+   * constraint and the hook matters more than the keywords.
+   */
+  seoTitle?: string;
+  /** Shown on the card. Also the social description. */
   excerpt: string;
+  /**
+   * Meta description. The excerpts run 158 to 206 characters because they earn
+   * their length on the index card; a search snippet shows about 155.
+   */
+  seoDescription?: string;
   /** One-line kicker above the title. */
   kicker: string;
   discipline: string;
@@ -108,6 +121,22 @@ const BASELINE_NOTE =
 const SCENARIO_NOTE =
   "This study works from a scenario rather than a named client. The operational figures are the scenario's parameters plus my own modelling, and the industry benchmarks are cited to their sources in the original report. Nothing here is a claim about a real company's internal reporting.";
 
+/**
+ * When these pieces were last substantially revised, as distinct from when they
+ * were published.
+ *
+ * All six were rewritten in one pass: roughly five times the original length,
+ * from the underlying reports, with 56 figures added. `isoDate` stays the
+ * publication date so the dateline and `datePublished` keep telling the truth,
+ * and this drives `dateModified` and the sitemap's `lastmod`. Using the
+ * publication date for both would tell a crawler that nothing has changed since
+ * January, which is the opposite of what happened.
+ *
+ * Bump this by hand on the next real revision. Not `new Date()`: that stamps
+ * every build and teaches crawlers the dates mean nothing.
+ */
+export const CONTENT_REVISED = "2026-08-17";
+
 export const blogIntro =
   "Process work is mostly a writing problem. You can draw a flawless future state and still change nothing, because the argument for it never got made in terms anyone could act on. These are six studies where the analysis had to survive that test.";
 
@@ -117,6 +146,9 @@ type PostSource = Omit<BlogPost, "readingMinutes" | "wordCount">;
 const source: PostSource[] = [
   {
     slug: "it-service-desk-ticket-resolution",
+    seoTitle: "IT Service Desk Process Analysis with BPMN",
+    seoDescription:
+      "A BPMN and TIMWOOD waste analysis of a university IT help desk resolving tickets in 72 hours against a 24 hour target.",
     title:
       "72 Hours to Resolve a Ticket, and the Three Places It Actually Went",
     kicker: "Process analysis",
@@ -310,6 +342,9 @@ const source: PostSource[] = [
   },
   {
     slug: "study-space-design-thinking",
+    seoTitle: "Design Thinking: Study Room Booking Redesign",
+    seoDescription:
+      "A design thinking case study: twenty participants, four research methods, and a booking redesign built around the students who had stopped trying.",
     title: "The Booking System Worked. Students Still Could Not Get a Room.",
     kicker: "Design thinking",
     discipline: "Design Thinking",
@@ -497,6 +532,9 @@ const source: PostSource[] = [
   },
   {
     slug: "course-evaluation-platform-replacement",
+    seoTitle: "Course Evaluation Platform: $1.5M Project Plan",
+    seoDescription:
+      "A PMBOK project plan to replace a course evaluation system: stakeholder analysis, a 4,080 hour work breakdown, risk register and hybrid delivery.",
     title: "A 28% Response Rate Is Not a Participation Problem",
     kicker: "Project management",
     discipline: "Project Management",
@@ -685,6 +723,9 @@ const source: PostSource[] = [
   },
   {
     slug: "returns-refunds-process-redesign",
+    seoTitle: "E-Commerce Returns Process Redesign with BPMN",
+    seoDescription:
+      "Diagnosing a returns process that paid refunds before inspection: SIPOC, BPMN 2.0, five whys, TIMWOOD waste analysis and seven KPIs with owners.",
     title: "The Refund Fired Before Anyone Looked at the Box",
     kicker: "Process redesign",
     discipline: "Process Redesign",
@@ -867,6 +908,9 @@ const source: PostSource[] = [
   },
   {
     slug: "parking-permit-service-redesign",
+    seoTitle: "Parking Permit Service Redesign Case Study",
+    seoDescription:
+      "Service design for a university parking permit system: seven interviews, 38 ideas, three prototype rounds and a 71% cut in support tickets.",
     title:
       "Thirty-Four Percent of Purchases Needed a Human. The Form Was Asking the Wrong Question.",
     kicker: "Service design",
@@ -1031,6 +1075,9 @@ const source: PostSource[] = [
   },
   {
     slug: "invoice-automation-governance",
+    seoTitle: "RPA Invoice Automation Project Governance",
+    seoDescription:
+      "Governance design for a $250,000 RPA pilot in accounts payable, built around the prior automation failure: RACI, gates, maturity and fraud controls.",
     title:
       "The Last Automation Attempt Failed. That Shaped Everything About This One.",
     kicker: "Delivery governance",
