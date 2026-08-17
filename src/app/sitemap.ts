@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { postsByDate } from "@/content/blog";
 import { projects, SITE_URL } from "@/content/site";
 import { projectImageSrc } from "@/lib/project-media";
 
@@ -32,6 +33,21 @@ export default function sitemap(): MetadataRoute.Sitemap {
       // images get discovered, since they are CSS backgrounds on the detail
       // page rather than content <img> elements.
       images: [`${SITE_URL}${projectImageSrc(project.slug)}`],
+    })),
+    {
+      url: `${SITE_URL}/blog`,
+      lastModified: new Date(postsByDate[0].isoDate),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    // Article dates come from the posts themselves rather than the build, so a
+    // redeploy does not tell crawlers that every piece was rewritten.
+    ...postsByDate.map((post) => ({
+      url: `${SITE_URL}/blog/${post.slug}`,
+      lastModified: new Date(post.isoDate),
+      changeFrequency: "yearly" as const,
+      priority: 0.7,
+      images: [`${SITE_URL}/blog/${post.slug}.jpg`],
     })),
   ];
 }
