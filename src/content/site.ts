@@ -1556,20 +1556,12 @@ export const contactReasons = [
  * Order here must match the render order in app/page.tsx, otherwise the
  * scroll-spy highlight jumps around as you scroll.
  */
-/**
- * Nav entries. Most are sections on the home page and scroll to an anchor.
- * `href` marks the exceptions: entries that are routes of their own, which the
- * nav links to directly rather than treating as a scroll target. Without the
- * distinction the scroll-spy would look for an element that is not on the page
- * and the link would try to scroll to nothing.
- */
 export const sections = [
   { id: "home", label: "Home" },
   { id: "about", label: "About" },
   { id: "education", label: "Education" },
   { id: "experience", label: "Experience" },
   { id: "projects", label: "Projects" },
-  { id: "blog", label: "Writing", href: "/blog" },
   { id: "skills", label: "Skills" },
   { id: "contact", label: "Contact" },
 ] as const;

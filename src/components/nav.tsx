@@ -24,7 +24,6 @@ import { cn } from "@/lib/utils";
  */
 function SectionLink({
   id,
-  href,
   isHome,
   className,
   onClick,
@@ -32,29 +31,12 @@ function SectionLink({
   children,
 }: {
   id: string;
-  /** Set for entries that are routes rather than sections, such as Writing. */
-  href?: string;
   isHome: boolean;
   className?: string;
   onClick?: () => void;
   ariaCurrent?: boolean;
   children: ReactNode;
 }) {
-  // A route entry has nothing to scroll to, so it always goes through Link,
-  // from the home page as well as anywhere else.
-  if (href) {
-    return (
-      <Link
-        href={href}
-        className={className}
-        onClick={onClick}
-        aria-current={ariaCurrent ? "page" : undefined}
-      >
-        {children}
-      </Link>
-    );
-  }
-
   if (isHome) {
     return (
       <a
@@ -84,7 +66,6 @@ export function Nav() {
   const pathname = usePathname();
   const isHome = pathname === "/";
   const onProjectPage = pathname.startsWith("/projects");
-  const onBlog = pathname.startsWith("/blog");
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState<string>("");
@@ -109,10 +90,8 @@ export function Nav() {
       { rootMargin: "-45% 0px -45% 0px", threshold: [0, 0.25, 0.5, 1] },
     );
 
-    for (const section of sections) {
-      // Route entries such as Writing have no element here to observe.
-      if ("href" in section) continue;
-      const el = document.getElementById(section.id);
+    for (const { id } of sections) {
+      const el = document.getElementById(id);
       if (el) observer.observe(el);
     }
     return () => observer.disconnect();
@@ -168,17 +147,14 @@ export function Nav() {
             // On the home page the observer decides. On a project page nothing
             // is observable, so Projects is marked instead: that is the section
             // the visitor came from and would return to.
-            const current = onBlog
-              ? section.id === "blog"
-              : isHome
-                ? active === section.id
-                : onProjectPage && section.id === "projects";
+            const current = isHome
+              ? active === section.id
+              : onProjectPage && section.id === "projects";
 
             return (
               <li key={section.id}>
                 <SectionLink
                   id={section.id}
-                  href={"href" in section ? section.href : undefined}
                   isHome={isHome}
                   ariaCurrent={current}
                   className={cn(
@@ -255,7 +231,6 @@ export function Nav() {
                 <li key={section.id}>
                   <SectionLink
                     id={section.id}
-                    href={"href" in section ? section.href : undefined}
                     isHome={isHome}
                     onClick={() => setOpen(false)}
                     className="block rounded-lg px-2 py-2.5 text-base text-muted transition-colors hover:bg-surface-raised hover:text-foreground"
