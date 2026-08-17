@@ -69,12 +69,11 @@ export default async function BlogPost({ params }: Params) {
         description: post.excerpt,
         articleSection: post.discipline,
         keywords: post.tags.join(", "),
-        wordCount:
-          post.intro.join(" ").split(/\s+/).length +
-          post.sections.reduce(
-            (n, s) => n + s.body.join(" ").split(/\s+/).length,
-            0,
-          ),
+        // The same count the reading time is derived from. Computing it here
+        // separately is how the markup came to claim 535 words on a 750 word
+        // article: this version skipped the lists, the stats and the closing.
+        wordCount: post.wordCount,
+        timeRequired: `PT${post.readingMinutes}M`,
         datePublished: post.isoDate,
         dateModified: post.isoDate,
         image: `${SITE_URL}/blog/${post.slug}.jpg`,
@@ -113,19 +112,44 @@ export default async function BlogPost({ params }: Params) {
               sentence below the fold for no editorial gain. */}
           <header className="hairline pt-28 sm:pt-32">
             <div className="container-page pb-12">
+              {/* A trail, not a single back link. A post is two levels deep,
+                  so one "up" only reached /blog: getting home meant finding it
+                  in the nav, where the section links are hidden below 1024px.
+                  Showing both rungs also makes the visible navigation agree
+                  with the BreadcrumbList below. */}
               <Reveal>
-                <Link
-                  href="/blog"
-                  className="group inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.16em] text-muted transition-colors duration-300 hover:text-accent"
+                <nav
+                  aria-label="Breadcrumb"
+                  className="font-mono text-[11px] uppercase tracking-[0.16em] text-muted"
                 >
-                  <span
-                    aria-hidden="true"
-                    className="inline-block transition-transform duration-300 group-hover:-translate-x-1"
-                  >
-                    ←
-                  </span>
-                  All writing
-                </Link>
+                  <ol className="flex flex-wrap items-center gap-x-3 gap-y-2">
+                    <li>
+                      <Link
+                        href="/#projects"
+                        className="group inline-flex items-center gap-2 transition-colors duration-300 hover:text-accent"
+                      >
+                        <span
+                          aria-hidden="true"
+                          className="inline-block transition-transform duration-300 group-hover:-translate-x-1"
+                        >
+                          ←
+                        </span>
+                        Portfolio
+                      </Link>
+                    </li>
+                    <li aria-hidden="true" className="text-subtle">
+                      /
+                    </li>
+                    <li>
+                      <Link
+                        href="/blog"
+                        className="transition-colors duration-300 hover:text-accent"
+                      >
+                        All writing
+                      </Link>
+                    </li>
+                  </ol>
+                </nav>
               </Reveal>
 
               <Reveal delay={0.05}>

@@ -1,5 +1,5 @@
 /**
- * Long-form writing: process engineering case studies.
+ * Writing: process engineering case studies.
  *
  * Same house rules as `site.ts`. Every figure here comes from the underlying
  * analysis rather than being invented for the page, and there are no em dashes
@@ -33,7 +33,10 @@ export type BlogPost = {
   date: string;
   /** ISO, for dateline and structured data. */
   isoDate: string;
+  /** Derived, never authored. See `withDerived`. */
   readingMinutes: number;
+  /** Derived. Shared with the JSON-LD so the page and the markup agree. */
+  wordCount: number;
   tags: string[];
   /** The line that carries the card, deliberately short. */
   cardLine: string;
@@ -52,7 +55,10 @@ const BASELINE_NOTE =
 export const blogIntro =
   "Process work is mostly a writing problem. You can draw a flawless future state and still change nothing, because the argument for it never got made in terms anyone could act on. These are six studies where the analysis had to survive that test.";
 
-export const posts: BlogPost[] = [
+/** Authored shape. The two derived fields are added by `withDerived`. */
+type PostSource = Omit<BlogPost, "readingMinutes" | "wordCount">;
+
+const source: PostSource[] = [
   {
     slug: "it-service-desk-ticket-resolution",
     title: "72 Hours to Resolve a Ticket, and the Three Places It Actually Went",
@@ -60,7 +66,6 @@ export const posts: BlogPost[] = [
     discipline: "Process Analysis",
     date: "November 2025",
     isoDate: "2025-11-14",
-    readingMinutes: 11,
     tags: ["BPMN", "TIMWOOD", "Root Cause Analysis", "Service Management"],
     cardLine: "Averages hide where the time goes. Waste analysis finds it.",
     excerpt:
@@ -147,7 +152,6 @@ export const posts: BlogPost[] = [
     discipline: "Design Thinking",
     date: "November 2025",
     isoDate: "2025-11-21",
-    readingMinutes: 12,
     tags: ["Design Thinking", "User Research", "Journey Mapping", "Prototyping"],
     cardLine: "A working system solving the wrong problem.",
     excerpt:
@@ -206,7 +210,6 @@ export const posts: BlogPost[] = [
     discipline: "Project Management",
     date: "December 2025",
     isoDate: "2025-12-05",
-    readingMinutes: 12,
     tags: ["Project Charter", "WBS", "Critical Path", "Risk Management"],
     cardLine: "Below 35%, the data stops meaning anything.",
     excerpt:
@@ -270,7 +273,6 @@ export const posts: BlogPost[] = [
     discipline: "Process Redesign",
     date: "December 2025",
     isoDate: "2025-12-12",
-    readingMinutes: 13,
     tags: ["SIPOC", "BPMN", "Fraud Controls", "Process Governance"],
     cardLine: "An ordering bug, running at commercial scale.",
     excerpt:
@@ -343,7 +345,6 @@ export const posts: BlogPost[] = [
     discipline: "Design Thinking",
     date: "January 2026",
     isoDate: "2026-01-16",
-    readingMinutes: 13,
     tags: ["Service Design", "Prototyping", "Concept Selection", "Usability Testing"],
     cardLine: "58% picked the right permit. The rest called.",
     excerpt:
@@ -406,7 +407,6 @@ export const posts: BlogPost[] = [
     discipline: "Project Governance",
     date: "January 2026",
     isoDate: "2026-01-30",
-    readingMinutes: 14,
     tags: ["RPA", "Hybrid Delivery", "Stage Gates", "Risk Management"],
     cardLine: "Scoped to 70%, because 100% is how the last one failed.",
     excerpt:
@@ -469,6 +469,44 @@ export const posts: BlogPost[] = [
     ],
   },
 ];
+
+/**
+ * 225 words a minute, the usual average for adult silent reading of non-fiction
+ * prose. Platforms sit between 200 and 265, so this is deliberately mid-range
+ * rather than flattering.
+ */
+const WORDS_PER_MINUTE = 225;
+
+/** Everything a reader actually reads, in the order they meet it. */
+function countWords(post: PostSource): number {
+  const words = (s: string) => s.trim().split(/\s+/).filter(Boolean).length;
+  let n = words(post.title) + post.intro.reduce((a, s) => a + words(s), 0);
+  for (const section of post.sections) {
+    n += words(section.heading);
+    n += section.body.reduce((a, s) => a + words(s), 0);
+    for (const item of section.list ?? []) n += words(item.term) + words(item.detail);
+    for (const stat of section.stats ?? []) n += words(stat.value) + words(stat.label);
+  }
+  return n + post.closing.reduce((a, s) => a + words(s), 0);
+}
+
+/**
+ * Reading time is computed, not authored. It was authored once, and every one of
+ * the six was roughly four times the real figure: 11 to 14 minutes claimed
+ * against 500 to 750 words, which is two to three. A number nobody can check
+ * without a stopwatch still has to be true, and deriving it means it cannot
+ * drift again when the copy is edited.
+ */
+function withDerived(post: PostSource): BlogPost {
+  const wordCount = countWords(post);
+  return {
+    ...post,
+    wordCount,
+    readingMinutes: Math.max(1, Math.round(wordCount / WORDS_PER_MINUTE)),
+  };
+}
+
+export const posts: BlogPost[] = source.map(withDerived);
 
 /** Newest first, so the index does not depend on array order being maintained. */
 export const postsByDate = [...posts].sort((a, b) =>

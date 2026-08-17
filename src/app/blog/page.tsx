@@ -70,22 +70,42 @@ export default function BlogIndex() {
         {/* Masthead */}
         <header className="hairline pt-28 sm:pt-32">
           <div className="container-page pb-14 sm:pb-16">
+            {/* Route back to the portfolio, same treatment the project pages
+                use. Without it this page's only way home was inside the nav,
+                where the section links are hidden below 1024px and the brand
+                loses its label below 640px, leaving an unlabelled memoji as the
+                sole affordance on a phone. Points at #projects rather than the
+                top because that is the section the visitor left to get here. */}
             <Reveal>
-              <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-highlight">
+              <Link
+                href="/#projects"
+                className="group inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.16em] text-muted transition-colors duration-300 hover:text-accent"
+              >
+                <span
+                  aria-hidden="true"
+                  className="inline-block transition-transform duration-300 group-hover:-translate-x-1"
+                >
+                  ←
+                </span>
+                Back to portfolio
+              </Link>
+            </Reveal>
+            <Reveal delay={0.05}>
+              <p className="mt-8 font-mono text-[11px] uppercase tracking-[0.18em] text-highlight">
                 Writing
               </p>
             </Reveal>
-            <Reveal delay={0.05}>
+            <Reveal delay={0.08}>
               <h1 className="mt-5 max-w-4xl text-balance text-[clamp(2rem,5vw,3.5rem)] font-medium leading-[1.04] tracking-[-0.03em]">
                 Notes on making processes work
               </h1>
             </Reveal>
-            <Reveal delay={0.1}>
+            <Reveal delay={0.12}>
               <p className="mt-6 max-w-2xl text-pretty text-lg leading-relaxed text-muted">
                 {blogIntro}
               </p>
             </Reveal>
-            <Reveal delay={0.15}>
+            <Reveal delay={0.16}>
               <p className="mt-8 font-mono text-[11px] uppercase tracking-[0.16em] text-subtle">
                 {postsByDate.length} pieces
               </p>

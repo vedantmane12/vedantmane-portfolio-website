@@ -74,8 +74,11 @@ export function Work() {
                 Writing
               </p>
               <p className="mt-3 text-pretty text-lg leading-relaxed text-muted">
-                {posts.length} long-form case studies on process analysis,
-                design thinking and delivery governance.
+                {/* Was "long-form", which these are not: they run 500 to 750
+                    words. Dropping the claim costs nothing and removes a word
+                    the pieces cannot back up. */}
+                {posts.length} case studies on process analysis, design thinking
+                and delivery governance.
               </p>
             </div>
 
