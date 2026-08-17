@@ -169,10 +169,13 @@ export default async function BlogPost({ params }: Params) {
             </Reveal>
           </div>
 
-          {/* Body. Measure is capped near 68 characters, which is where long
-              prose stops being comfortable regardless of how wide the screen is. */}
+          {/* Body. 35rem is 560px, which at the 17px body size and Manrope's
+              measured average glyph width of 8.01px comes to about 70
+              characters a line, inside the 45 to 75 range prose stays
+              comfortable in. The previous 42rem measured 84, which is past the
+              point where the eye starts losing its place on the return sweep. */}
           <div className="container-page py-14 sm:py-16">
-            <div className="mx-auto max-w-[42rem]">
+            <div className="mx-auto max-w-[35rem]">
               {post.sourceNote && (
                 <Reveal>
                   <p className="mb-10 border-l-2 border-border pl-5 text-[13px] leading-relaxed text-subtle">
