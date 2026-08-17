@@ -52,7 +52,7 @@ const title = `${person.name} | ${person.role}`;
 // search snippet shows roughly 155 characters, so the version that went out at
 // 230 lost its last clause. A social card has room for the longer one, and the
 // extra detail is worth having where it will actually be read.
-const description = `${person.name} is a Data Engineer and AI Developer in ${person.location}. Real-time ETL and dimensional warehousing on Databricks and Snowflake, plus multi-agent AI with LangGraph.`;
+const description = `${person.name}, Data Engineer and AI Developer in ${person.location}. Real-time ETL and dimensional warehousing on Databricks and Snowflake, plus multi-agent AI.`;
 const socialDescription = `${person.name} is a Data Engineer and AI Developer in ${person.location} with 3+ years building production data platforms. Real-time ETL, dimensional warehousing on Databricks and Snowflake, and multi-agent AI systems with LangGraph and RAG.`;
 
 export const metadata: Metadata = {
