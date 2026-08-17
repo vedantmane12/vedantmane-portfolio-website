@@ -28,7 +28,16 @@ export type BlogSection = {
   body: string[];
   /** Optional pull-out list under the paragraphs. */
   list?: { term: string; detail: string }[];
-  /** Optional figure callouts, rendered as a small stat row. */
+  /**
+   * Optional figure callouts, rendered as a small stat row.
+   *
+   * Keep `value` to about 10 characters. The row is three columns from 640px up
+   * and the article measure caps its container at 560px, so each cell is 154px
+   * at every width above mobile, which fits roughly ten characters of 24px
+   * monospace. Longer values wrap and knock the labels out of alignment. Put the
+   * comparison in the label: "Under 8%" with "from 30% today", not
+   * "30% to under 8%".
+   */
   stats?: { value: string; label: string }[];
 };
 
@@ -233,8 +242,9 @@ const source: PostSource[] = [
             label: "Projected average resolution, a 61% reduction",
           },
           {
-            value: "30% to under 8%",
-            label: "Tickets reaching the wrong team first",
+            value: "Under 8%",
+            label:
+              "Target for tickets reaching the wrong team first, from 30% today",
           },
           {
             value: "25% to 30%",
@@ -420,16 +430,19 @@ const source: PostSource[] = [
         ],
         stats: [
           {
-            value: "35% to under 10%",
-            label: "Target booking mismatch rate, from Finding 2",
+            value: "Under 10%",
+            label:
+              "Target booking mismatch rate, from about 35% today. Finding 2",
           },
           {
-            value: "30% to over 65%",
-            label: "Target walk-up success rate, from Finding 4",
+            value: "Over 65%",
+            label:
+              "Target walk-up success rate, from about 30% today. Finding 4",
           },
           {
-            value: "60 to under 20",
-            label: "Target weekly no-show and overstay incidents",
+            value: "Under 20",
+            label:
+              "Target weekly no-show and overstay incidents, from about 60",
           },
         ],
       },
@@ -704,8 +717,11 @@ const source: PostSource[] = [
             label: "Refunds issued before inspection completed, target 0%",
           },
           {
-            value: "4h to 6 days",
-            label: "Inspection cycle time against a 24 to 48 hour target",
+            // The spread is the finding, so it leads: 6 days is 144 hours,
+            // which is 36 times the 4 hour best case.
+            value: "36x",
+            label:
+              "Spread in inspection cycle time, 4 hours to 6 days against a 24 to 48 hour target",
           },
           {
             value: "Under 30%",
