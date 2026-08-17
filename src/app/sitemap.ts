@@ -47,7 +47,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date(post.isoDate),
       changeFrequency: "yearly" as const,
       priority: 0.7,
-      images: [`${SITE_URL}/blog/${post.slug}.jpg`],
+      // The cover photograph plus every figure in the article. The figures are
+      // the diagrams the analysis actually produced, and each one carries real
+      // alt text, so they are worth surfacing to image search rather than
+      // leaving them discoverable only by crawling the page body.
+      images: [
+        `${SITE_URL}/blog/${post.slug}.jpg`,
+        ...post.sections.flatMap((section) =>
+          (section.figures ?? []).map((figure) => `${SITE_URL}${figure.src}`),
+        ),
+      ],
     })),
   ];
 }

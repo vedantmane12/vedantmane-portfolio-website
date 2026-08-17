@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { BlogFigureBlock } from "@/components/blog-figure";
 import { Footer } from "@/components/footer";
 import { Reveal } from "@/components/motion/reveal";
 import { ScrollProgress } from "@/components/motion/scroll-progress";
@@ -13,6 +14,12 @@ import { cn } from "@/lib/utils";
 
 /** `params` is a Promise in this version of Next and has to be awaited. */
 type Params = { params: Promise<{ slug: string }> };
+
+/**
+ * The prose measure. Applied per block rather than once around the whole body,
+ * so figures can sit wider than the text. See the comment above the body.
+ */
+const MEASURE = "mx-auto max-w-[35rem]";
 
 export function generateStaticParams() {
   return posts.map((post) => ({ slug: post.slug }));
@@ -58,6 +65,17 @@ export default async function BlogPost({ params }: Params) {
   const index = postsByDate.findIndex((p) => p.slug === slug);
   const next = postsByDate[(index + 1) % postsByDate.length];
   const pageUrl = `${SITE_URL}/blog/${post.slug}`;
+
+  /**
+   * Figure numbers run continuously through the article, so "Fig 3" in a caption
+   * means the third figure on the page rather than the third in its section.
+   * Resolved from a flat list up front because the figures render inside a
+   * per-section map that has no view of what came before it.
+   */
+  const figureOrder = post.sections.flatMap((s) =>
+    (s.figures ?? []).map((fig) => fig.src),
+  );
+  const figureNumber = (src: string) => figureOrder.indexOf(src) + 1;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -196,21 +214,31 @@ export default async function BlogPost({ params }: Params) {
             </Reveal>
           </div>
 
-          {/* Body. 35rem is 560px, which at the 17px body size and Manrope's
-              measured average glyph width of 8.01px comes to about 70
-              characters a line, inside the 45 to 75 range prose stays
-              comfortable in. The previous 42rem measured 84, which is past the
-              point where the eye starts losing its place on the return sweep. */}
+          {/* Body.
+              MEASURE is 35rem, which is 560px. At the 17px body size and
+              Manrope's measured average glyph width of 8.01px that comes to
+              about 70 characters a line, inside the 45 to 75 range prose stays
+              comfortable in.
+
+              The measure is applied per block rather than once around
+              everything, because figures have to be wider than the prose to be
+              readable at all. A BPMN model with forty labelled elements set into
+              a 560px column is decoration. Negative margins were the other
+              option and they are worse: container-page has only 80px of slack
+              each side at 768px, so the safe value differs per breakpoint and
+              silently overflows the day the padding changes. */}
           <div className="container-page py-14 sm:py-16">
-            <div className="mx-auto max-w-[35rem]">
-              {post.sourceNote && (
+            {post.sourceNote && (
+              <div className={MEASURE}>
                 <Reveal>
                   <p className="mb-10 border-l-2 border-border pl-5 text-[13px] leading-relaxed text-subtle">
                     {post.sourceNote}
                   </p>
                 </Reveal>
-              )}
+              </div>
+            )}
 
+            <div className={MEASURE}>
               {post.intro.map((para, i) => (
                 <Reveal key={i} delay={0.04 * i}>
                   <p className="mb-6 text-pretty text-xl leading-[1.65] text-foreground/90">
@@ -218,9 +246,11 @@ export default async function BlogPost({ params }: Params) {
                   </p>
                 </Reveal>
               ))}
+            </div>
 
-              {post.sections.map((section) => (
-                <section key={section.heading} className="mt-14">
+            {post.sections.map((section) => (
+              <section key={section.heading} className="mt-14">
+                <div className={MEASURE}>
                   <Reveal>
                     <h2 className="text-[clamp(1.3rem,2.6vw,1.7rem)] font-medium tracking-[-0.025em]">
                       {section.heading}
@@ -271,9 +301,25 @@ export default async function BlogPost({ params }: Params) {
                       </ul>
                     </Reveal>
                   )}
-                </section>
-              ))}
+                </div>
 
+                {section.figures?.map((figure) => (
+                  <div
+                    key={figure.src}
+                    className="mx-auto max-w-3xl lg:max-w-5xl"
+                  >
+                    <Reveal>
+                      <BlogFigureBlock
+                        figure={figure}
+                        index={figureNumber(figure.src)}
+                      />
+                    </Reveal>
+                  </div>
+                ))}
+              </section>
+            ))}
+
+            <div className={MEASURE}>
               <div className="hairline mt-16 pt-10">
                 {post.closing.map((para, i) => (
                   <Reveal key={i} delay={0.03 * i}>

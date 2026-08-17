@@ -22,12 +22,44 @@
  * measurement method won and the conflict is noted in the section comment.
  */
 
+/**
+ * A figure lifted from the original analysis: BPMN models, journey maps,
+ * fishbone diagrams, risk matrices, prototype screens.
+ *
+ * `width` and `height` are the real pixel dimensions of the asset, so the page
+ * reserves the right box and never shifts on load, and so the component can
+ * refuse to upscale a figure past its native size. Several of these were
+ * embedded in the source PDFs at modest resolution and go blurry if stretched.
+ *
+ * `tone` is measured, not guessed: it comes from the mean luminance of the
+ * processed file. It decides which way the frame and the zoom affordance need
+ * to contrast, since roughly a third of these figures were authored dark and
+ * the rest light.
+ */
+export type BlogFigure = {
+  /** Path under /public. */
+  src: string;
+  width: number;
+  height: number;
+  /** Describes what the figure contains, for screen readers and for search. */
+  alt: string;
+  /** Visible caption. Says what to look for rather than restating the alt. */
+  caption: string;
+  tone: "light" | "dark";
+};
+
 export type BlogSection = {
   heading: string;
   /** Paragraphs. Rendered in order, no markdown parsing needed. */
   body: string[];
   /** Optional pull-out list under the paragraphs. */
   list?: { term: string; detail: string }[];
+  /**
+   * Figures illustrating this section. Attached by heading from `FIGURES` in
+   * `withDerived` rather than written inline, so the prose stays readable and
+   * so an orphaned figure fails the build instead of vanishing quietly.
+   */
+  figures?: BlogFigure[];
   /**
    * Optional figure callouts, rendered as a small stat row.
    *
@@ -1189,6 +1221,269 @@ const source: PostSource[] = [
   },
 ];
 
+const f = (
+  slug: string,
+  width: number,
+  height: number,
+  tone: "light" | "dark",
+  alt: string,
+  caption: string,
+): BlogFigure => ({
+  src: `/blog/figures/${slug}.webp`,
+  width,
+  height,
+  tone,
+  alt,
+  caption,
+});
+
+/**
+ * Figures, keyed by post slug then by the exact heading of the section they sit
+ * under. Every one is lifted from the original analysis rather than drawn for
+ * the page, trimmed and converted to WebP but otherwise unaltered.
+ *
+ * Keying on the heading string rather than an index means reordering sections
+ * cannot silently move a figure to the wrong argument, and `withDerived` throws
+ * if a key here matches no heading.
+ */
+const FIGURES: Record<string, Record<string, BlogFigure[]>> = {
+  "it-service-desk-ticket-resolution": {
+    "Mapping what actually happens, not what is documented": [
+      f(
+        "service-desk-as-is-bpmn",
+        2000,
+        1099,
+        "light",
+        "Swimlane BPMN model of the current ticket resolution process across five lanes: User, Systems, Tier 1 Support, Tier 2 Support and Tier 3 Support. A loop runs from Reroute Ticket back to Review Ticket Description, and a second loop pauses the process to request additional information from the user.",
+        "The as-is model, drawn from how tickets actually moved rather than from the process document. The two loops are the finding: Reroute Ticket returning to Review Ticket Description, and Provide Additional Information stopping the work entirely. Neither appears in the documented flow.",
+      ),
+    ],
+    "Root cause, not symptom": [
+      f(
+        "service-desk-fishbone",
+        1327,
+        831,
+        "light",
+        "Fishbone diagram with the 30 percent ticket miscategorisation rate as the effect and six cause categories: People, Process, Technology, Information, Environment and Management, each carrying three contributing factors.",
+        "Six categories, eighteen contributing factors. Technology and Information hold the ones that matter: no assisted categorisation, basic keyword matching, vague descriptions, no required fields. People contributes experience and workload, which is exactly why retraining triage staff would have missed.",
+      ),
+    ],
+    "The capability was already bought and not switched on": [
+      f(
+        "service-desk-to-be-bpmn",
+        2000,
+        1101,
+        "light",
+        "Swimlane BPMN model of the redesigned process with a new AI and Automation lane containing knowledge base retrieval, ticket categorisation, queue routing and recurring pattern detection. A complexity gateway splits work into simple, standard, complex and critical paths.",
+        "The to-be model. The new automation lane does the categorising and routing, the complexity gateway replaces the single queue with four paths, and the branch to No Ticket Needed is the self-service deflection. Every capability in that lane was already licensed and unused.",
+      ),
+    ],
+  },
+
+  "study-space-design-thinking": {
+    "What twenty students actually reported": [
+      f(
+        "study-space-as-is-journey",
+        1804,
+        973,
+        "light",
+        "Current state journey map across seven stages from realising a need to settling or giving up, with swimlanes for Student, the booking system and Library staff, and an emotion row running neutral, confused, frustrated, hopeful, resigned, stressed and defeated.",
+        "Seven stages, three swimlanes, and an emotion row that carries the argument: hopeful at the point of booking, resigned on arrival. The pain points cluster at stages three to six, and the staff lane is almost empty, which is its own finding.",
+      ),
+    ],
+    "Framing the problem without prescribing the answer": [
+      f(
+        "study-space-personas",
+        1392,
+        1031,
+        "light",
+        "Three persona cards. Maya, a second year undergraduate who books for group study. Arjun, a first year masters student dependent on specific room features. Priya, a fourth year undergraduate with accessibility needs, labelled a disengaged user. Each card lists a goal, a frustration, a workaround and a usage frequency.",
+        "Composite profiles built from all twenty participants. The row that matters is Workaround: arrive ten minutes early, walk the floor, or stop booking altogether. Priya's card shaped the most decisions, because she had already left the system and would never have appeared in a complaint log.",
+      ),
+    ],
+    "Two prototypes, and what changed between them": [
+      f(
+        "study-space-prototype",
+        1100,
+        650,
+        "light",
+        "Four screens from the medium fidelity booking prototype: a needs input form with group size and feature checkboxes, a filtered results list showing three matching rooms with match bars, a room detail view, and a booking confirmation.",
+        "The medium-fidelity round. The accessibility filters sit in their own labelled section rather than inside the general checklist, and the coloured match bar has moved to the top of each room card. Both changes came out of the paper prototype, before any of this was built.",
+      ),
+    ],
+    "The final design, and the pilot that tests it": [
+      f(
+        "study-space-to-be-journey",
+        1964,
+        993,
+        "light",
+        "Future state journey map over the same seven stages and swimlanes as the current state map, with the emotion row now running neutral, calm, confident, informed, assured, relieved and satisfied.",
+        "The same seven stages after the redesign, drawn on the same swimlanes so the two maps can be read against each other. Stages three to six move from frustrated, hopeful, resigned and stressed to confident, informed, assured and relieved.",
+      ),
+    ],
+  },
+
+  "course-evaluation-platform-replacement": {
+    "Why more reminder emails were never going to work": [
+      f(
+        "course-eval-current-state",
+        670,
+        359,
+        "dark",
+        "Panel summarising current state problems in three groups: quantitative failures including a 28 percent response rate and 80 percent mobile abandonment, qualitative issues including punitive perception and a feedback black hole, and a competitive gap listing peer institution response rates. An arrow runs from 28 percent and 21 days to a target of 60 percent and 7 days.",
+        "The two metrics that define the project and the gap the plan has to close. The right-hand column is what turns an internal quality problem into a strategic one.",
+      ),
+    ],
+    "Where 4,080 hours actually go": [
+      f(
+        "course-eval-wbs",
+        1438,
+        821,
+        "dark",
+        "Work breakdown structure for the evaluation platform replacement, decomposed into nine work packages with hour counts and percentages, totalling 4,080 hours and 1.5 million dollars over 18 months.",
+        "Nine deliverable-based packages. Platform implementation and integration take 45% between them because of the twenty year old student information system, and training and change management take 15%, which is higher than most technology projects allocate and follows directly from the risk analysis.",
+      ),
+    ],
+    "Ten risks, and the three that interact": [
+      f(
+        "course-eval-risk-matrix",
+        997,
+        808,
+        "dark",
+        "Five by five risk probability and impact matrix plotting ten numbered risks, with union opposition, low student adoption and budget overrun positioned in the critical red zone at the top right.",
+        "Ten risks positioned by probability and impact. The three in the critical zone are union opposition, low adoption and budget overrun, and none can be solved with technology. What a matrix cannot show is that they cascade into one another.",
+      ),
+    ],
+    "Change readiness of 2.8 out of 5, and what follows from it": [
+      f(
+        "course-eval-readiness",
+        1238,
+        384,
+        "dark",
+        "Change readiness assessment scoring 2.8 out of 5 overall, broken into five bar-charted dimensions: leadership sponsorship 4.2, technical infrastructure 3.5, stakeholder alignment 2.5, change history 1.8 and user willingness to adopt 2.0.",
+        "Moderate readiness, with the weakness concentrated where it does most damage. Sponsorship is strong at 4.2. Change history is 1.8, and that number is the failed ERP implementation still shaping how faculty read any technology project.",
+      ),
+    ],
+    "Hybrid delivery, and where the boundary sits": [
+      f(
+        "course-eval-hybrid-model",
+        1094,
+        603,
+        "dark",
+        "Two layer delivery model. A waterfall governance layer with four sequential gates for requirements, integration, pilot and go-live. An agile execution layer of ten two week sprints covering platform configuration, dashboard and mobile development and pilot iteration, synchronised weekly.",
+        "Where the boundary sits, which is the whole decision. Waterfall governs anything carrying a fixed external commitment: budget gates, compliance documentation, milestone approvals. Agile runs the work whose requirements only become knowable once someone uses it.",
+      ),
+    ],
+  },
+
+  "returns-refunds-process-redesign": {
+    "Advanced BPMN, because the failures are in the exceptions": [
+      f(
+        "returns-as-is-bpmn",
+        1584,
+        2400,
+        "light",
+        "As-is BPMN model of the returns process across four swimlanes: Payment System, Customer Service, Warehouse and Customer. Annotations mark no fraud check at intake, silent label failure, a queue with no service level enforced, no standard grading rubric, an informal handoff losing information, and an inventory update never confirmed as a checkpoint. A dashed exception path runs from the customer's request straight to Process Refund.",
+        "The dashed path is the entire problem: it runs from Submits Request directly to Process Refund, bypassing inspection. Every annotation is a measured failure rather than a hypothetical, and the timer and error events are what make the waiting countable.",
+      ),
+    ],
+    "The future state, and its traceability": [
+      f(
+        "returns-to-be-bpmn",
+        1727,
+        2400,
+        "light",
+        "To-be BPMN model of the redesigned returns process across the same four swimlanes, adding fraud risk scoring at intake with low, medium and high routing, a mandatory inspection complete gate before refund approval, a real time duplicate check, and automatic approval for low risk returns.",
+        "The same four lanes with the sequence enforced. The inspection-complete gate makes a premature refund structurally impossible rather than discouraged, and the auto-approve branch is only safe because that gate exists ahead of it.",
+      ),
+    ],
+  },
+
+  "parking-permit-service-redesign": {
+    "Why three fixes failed": [
+      f(
+        "parking-systems-architecture",
+        1312,
+        733,
+        "light",
+        "Diagram of three disconnected systems: a 1988 mainframe, a 2005 web portal and a 2019 citation system, with broken links between them, alongside a failed two week mobile app and a chatbot returning wrong information.",
+        "The technical picture the Parking Office was working from, and it is entirely accurate. A 1988 mainframe, a 2005 portal, a 2019 citation system, none of them talking. It is also not the reason students could not buy a permit.",
+      ),
+    ],
+    "What the office saw, and what the research found": [
+      f(
+        "parking-reframe",
+        1031,
+        576,
+        "light",
+        "Side by side comparison. On the left, the internal office perspective: permit codes, and an unreadable scan, print and mail appeal process taking two weeks with no confirmation. On the right, student reality: where can I park, how far is it, what will it cost, resolved through an app based experience.",
+        "The reframe the project turned on. The office saw a technology problem and solved it three times. Students were asking where they could park, how far it was and what it cost, and the portal answered none of those until after something had gone wrong.",
+      ),
+    ],
+    "Three rounds at rising fidelity, and the $110 that saved $12,000": [
+      f(
+        "parking-prototype",
+        614,
+        1243,
+        "light",
+        "Four mobile screens from the high fidelity prototype: a question asking who the student is parking as, a permit recommendation list written in plain language, a lot selection screen with a map, and a payment confirmation.",
+        "The permit flow from the high-fidelity round. Look at the permit names: plain language, not the eight internal codes. That rename was a spreadsheet edit with no code behind it, and it drove the largest single improvement in the project.",
+      ),
+    ],
+    "What the pilot produced": [
+      f(
+        "parking-current-vs-future",
+        1255,
+        1507,
+        "light",
+        "Five stage comparison of current against future state covering permit selection, lot selection, hold discovery, support contact and citation appeal, with current pain points and future outcomes listed against each stage, ending in target metrics.",
+        "Stage by stage, before against after, with the figures attached to each. The right-hand column is the measured pilot result rather than a projection, which is why the conversation with the Parking Director changed.",
+      ),
+    ],
+  },
+
+  "invoice-automation-governance": {
+    "The prior failure, reconstructed and mapped": [
+      f(
+        "invoice-prior-failure",
+        1060,
+        1011,
+        "dark",
+        "Five whys chain for the failed expense report automation. Automation created more work, because exceptions piled up in a manual queue with no staff, because no exception handling rules were designed into the bot, because the vendor configured it from written policies rather than actual workflows, because accounts payable staff were not involved in the design process. Root cause: governance failure, not technology failure.",
+        "The most important input to this plan. Five levels down, the answer is that nobody who understood the work was in the room when the bot was configured. That single conclusion sets the scope boundary, the accountability assignments and both gates.",
+      ),
+    ],
+    "Governance the organisation can actually sustain": [
+      f(
+        "invoice-maturity",
+        1498,
+        616,
+        "dark",
+        "Project management maturity assessment scoring 2.2 out of 5, level two of five, with five bar-charted dimensions. Risk management scores lowest at 1.5 and change management at 1.8.",
+        "2.2 out of 5 is what the governance had to be designed for, not what it ought to be. Risk management at 1.5 is the alarming one for an automation project, because a bot applies a flawed rule 7,000 times a month rather than 300.",
+      ),
+    ],
+    "Decision rights, and three assignments worth defending": [
+      f(
+        "invoice-governance-tiers",
+        1236,
+        790,
+        "dark",
+        "Three tier governance structure. Tier one sponsor, the CFO, fortnightly fifteen minute reviews covering go and no-go decisions. Tier two governance, the project manager with an audit liaison and the accounts payable manager, weekly for thirty minutes, where most decisions are made. Tier three execution, the technical lead with the vendor and subject matter experts, daily fifteen minute standups.",
+        "Three tiers with deliberately small footprints, because a level two organisation running on half a full-time equivalent cannot sustain more. The audit liaison sitting in tier two rather than reviewing at the end is what resolves the speed against control tension.",
+      ),
+      f(
+        "invoice-raci",
+        1498,
+        654,
+        "dark",
+        "RACI matrix across project decision areas and seven roles, marking who is responsible, accountable, consulted and informed for each, with exactly one accountable role per row.",
+        "Exactly one A per row, which means exactly one person can be asked why something happened. The three worth defending: the accounts payable manager is accountable for exception design, internal audit is consulted rather than informed, and the CFO is informed on architecture rather than consulted.",
+      ),
+    ],
+  },
+};
+
 /**
  * 225 words a minute, the usual average for adult silent reading of non-fiction
  * prose. Platforms sit between 200 and 265, so this is deliberately mid-range
@@ -1220,10 +1515,29 @@ function countWords(post: PostSource): number {
  */
 function withDerived(post: PostSource): BlogPost {
   const wordCount = countWords(post);
+  const byHeading = FIGURES[post.slug] ?? {};
+
+  // A heading in FIGURES that matches nothing means a figure has been orphaned,
+  // usually by an edit to the heading it was keyed on. Fail the build rather
+  // than drop the diagram from the page without saying so.
+  const headings = new Set(post.sections.map((s) => s.heading));
+  for (const key of Object.keys(byHeading)) {
+    if (!headings.has(key)) {
+      throw new Error(
+        `blog.ts: figure key "${key}" does not match any section heading in "${post.slug}"`,
+      );
+    }
+  }
+
   return {
     ...post,
     wordCount,
     readingMinutes: Math.max(1, Math.round(wordCount / WORDS_PER_MINUTE)),
+    sections: post.sections.map((section) =>
+      byHeading[section.heading]
+        ? { ...section, figures: byHeading[section.heading] }
+        : section,
+    ),
   };
 }
 
