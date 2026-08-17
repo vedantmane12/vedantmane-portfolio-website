@@ -1281,6 +1281,16 @@ const FIGURES: Record<string, Record<string, BlogFigure[]>> = {
   },
 
   "study-space-design-thinking": {
+    "Four methods, because asking people is not enough": [
+      f(
+        "study-space-empathy-map",
+        874,
+        964,
+        "light",
+        "Empathy map for a composite Snell Library study space user, built from twenty research participants, divided into what the user thinks and feels, hears, sees, and says and does, with pains and gains listed underneath.",
+        "The four methods synthesised into one composite user. The value of the format is the gap it exposes between the Say and Do quadrant and the Think and Feel one: students describe walking over to check as normal, and separately describe the system as unfair.",
+      ),
+    ],
     "What twenty students actually reported": [
       f(
         "study-space-as-is-journey",
@@ -1306,7 +1316,7 @@ const FIGURES: Record<string, Record<string, BlogFigure[]>> = {
         "study-space-prototype",
         1100,
         650,
-        "light",
+        "dark",
         "Four screens from the medium fidelity booking prototype: a needs input form with group size and feature checkboxes, a filtered results list showing three matching rooms with match bars, a room detail view, and a booking confirmation.",
         "The medium-fidelity round. The accessibility filters sit in their own labelled section rather than inside the general checklist, and the coloured match bar has moved to the top of each room card. Both changes came out of the paper prototype, before any of this was built.",
       ),
@@ -1334,6 +1344,44 @@ const FIGURES: Record<string, Record<string, BlogFigure[]>> = {
         "The two metrics that define the project and the gap the plan has to close. The right-hand column is what turns an internal quality problem into a strategic one.",
       ),
     ],
+    "The business case, and the number I do not fully trust": [
+      f(
+        "course-eval-strategic-alignment",
+        1322,
+        772,
+        "dark",
+        "Strategic alignment diagram linking the evaluation platform to three pillars, educational excellence, student success and operational efficiency, above a value timeline running from immediate savings through years one to two and three to five, ending at a 447 percent return on investment with a 14 month payback.",
+        "How the money is argued. The timeline matters more than the headline: the immediate band is the operational saving, which is close to certain, and the later bands carry the retention assumption, which is the part I would not defend as firmly.",
+      ),
+      f(
+        "course-eval-roi",
+        1320,
+        760,
+        "dark",
+        "Return on investment panel showing 447 percent over five years, a 14 month payback, 8.2 million dollars net present value and 108 thousand dollars annual savings, above a table rating each value source by certainty, with retention improvement marked medium, operational savings high and reputation not quantified, followed by a sensitivity check.",
+        "The figure I flagged in the text, with its own certainty column attached. Operational savings are rated high, retention medium, reputation not quantified at all. The sensitivity note is the important line: at half the projected retention lift the return still clears 200 percent.",
+      ),
+    ],
+    "Putting the people who can block it inside the room": [
+      f(
+        "course-eval-charter",
+        1320,
+        770,
+        "dark",
+        "Project charter summary showing the project identifier, an 18 month timeline from January 2026 to June 2027 with a Fall 2027 launch, and a 1.5 million dollar budget, above a stakeholder approval matrix listing the Provost, Faculty Senate, faculty union, CIO and Student Government with what each must approve and by what method.",
+        "The approval matrix is the governance argument in one table. Faculty Senate approves the privacy policy by formal vote and the union approves workload impact by written agreement, which is what putting a blocker inside the tent actually looks like on paper.",
+      ),
+    ],
+    "Three stakeholder tensions a power grid does not capture": [
+      f(
+        "course-eval-stakeholder-grid",
+        1223,
+        944,
+        "dark",
+        "Stakeholder power and interest grid with four quadrants. Manage closely holds the Provost, Faculty Senate, faculty union and department chairs. Keep satisfied holds IT, Legal, the Registrar and Finance. Keep informed holds pilot departments, faculty champions, general faculty, students and the help desk. Monitor holds the board, alumni, parents and administrative staff.",
+        "The grid the analysis starts from, and the reason it is not where the analysis ends. Every genuine problem in this project is a relationship between two cells rather than a property of one, which a quadrant cannot show.",
+      ),
+    ],
     "Where 4,080 hours actually go": [
       f(
         "course-eval-wbs",
@@ -1343,15 +1391,69 @@ const FIGURES: Record<string, Record<string, BlogFigure[]>> = {
         "Work breakdown structure for the evaluation platform replacement, decomposed into nine work packages with hour counts and percentages, totalling 4,080 hours and 1.5 million dollars over 18 months.",
         "Nine deliverable-based packages. Platform implementation and integration take 45% between them because of the twenty year old student information system, and training and change management take 15%, which is higher than most technology projects allocate and follows directly from the risk analysis.",
       ),
+      f(
+        "course-eval-resources",
+        1320,
+        742,
+        "dark",
+        "Resource plan table listing each role with its full time equivalent allocation, duration, cost and key responsibility, covering project manager, business analyst, technical lead, change consultant, IT development team and other resources, totalling roughly 1.36 million dollars of staffing.",
+        "The same 4,080 hours priced by role. Two allocations carry the risk: the IT development team at 40% because it is shared with other university work, and the change consultant at half time because the workload genuinely peaks rather than running flat.",
+      ),
+    ],
+    "The critical path, and buying information early": [
+      f(
+        "course-eval-critical-path",
+        1270,
+        398,
+        "dark",
+        "Critical path diagram showing the longest chain of dependent activities: requirements, vendor selection, platform configuration, student information system integration, data migration, user acceptance testing and pilot, spanning 18 months with month markers on each link.",
+        "The chain with no float in it. Integration with the student information system sits in the middle, which is why the plan buys information early with a proof of concept in month three rather than discovering the problem at testing.",
+      ),
+      f(
+        "course-eval-timeline",
+        1530,
+        621,
+        "light",
+        "Gantt chart of the project timeline from January 2026 to June 2027, with bars for requirements, vendor selection, platform configuration, integration, data migration, testing and quality assurance, the pilot programme, training rollout and full deployment, plus a change management stream running in parallel throughout.",
+        "The same plan as a schedule. The bar worth noticing is the parallel change management stream at the bottom: it starts in month four and runs to the end, deliberately not waiting for the platform to exist.",
+      ),
+    ],
+    "The budget split I argued against and then chose anyway": [
+      f(
+        "course-eval-budget",
+        1320,
+        850,
+        "dark",
+        "Budget allocation table for 1.5 million dollars: software and licensing 600 thousand at 40 percent, integration development 300 thousand at 20 percent, data migration 200 thousand at 13 percent, change management 150 thousand at 10 percent, training 100 thousand at 7 percent and a contingency reserve of 150 thousand at 10 percent, with what each line includes.",
+        "The split, including the one I argued against. Change management at 10% is below the 15 to 20% that the literature recommends for change-heavy work, and the contingency line carries its own trigger conditions rather than being a general buffer.",
+      ),
     ],
     "Ten risks, and the three that interact": [
+      f(
+        "course-eval-risk-register",
+        1498,
+        1315,
+        "dark",
+        "Risk register listing ten risks with category, probability, impact, score, mitigation, contingency and owner. The top three by score are faculty union opposition blocking approval, student adoption below 40 percent, and budget overrun above 10 percent.",
+        "Ten risks traced to a specific constraint, assumption or dependency rather than pulled from a checklist. Each carries a named owner and a separate contingency, which is what makes the register something that gets acted on rather than filed.",
+      ),
       f(
         "course-eval-risk-matrix",
         997,
         808,
         "dark",
         "Five by five risk probability and impact matrix plotting ten numbered risks, with union opposition, low student adoption and budget overrun positioned in the critical red zone at the top right.",
-        "Ten risks positioned by probability and impact. The three in the critical zone are union opposition, low adoption and budget overrun, and none can be solved with technology. What a matrix cannot show is that they cascade into one another.",
+        "The same ten risks positioned by probability and impact. The three in the critical zone are all organisational, and none can be solved with technology. What a matrix cannot show is that they cascade into one another.",
+      ),
+    ],
+    "Quality means two different things depending on who asks": [
+      f(
+        "course-eval-quality-gates",
+        1141,
+        351,
+        "dark",
+        "Four sequential quality assurance gates: requirements sign-off at month three, integration testing at month nine, user acceptance and pilot at month fourteen requiring a 50 percent response rate, and go-live at month eighteen requiring accessibility compliance and completed training.",
+        "Four gates, each needing steering committee approval before the project moves on. The third is the one that matters: the pilot has to reach a 50% response rate to pass, which means adoption is a gate rather than a hope.",
       ),
     ],
     "Change readiness of 2.8 out of 5, and what follows from it": [
@@ -1362,6 +1464,34 @@ const FIGURES: Record<string, Record<string, BlogFigure[]>> = {
         "dark",
         "Change readiness assessment scoring 2.8 out of 5 overall, broken into five bar-charted dimensions: leadership sponsorship 4.2, technical infrastructure 3.5, stakeholder alignment 2.5, change history 1.8 and user willingness to adopt 2.0.",
         "Moderate readiness, with the weakness concentrated where it does most damage. Sponsorship is strong at 4.2. Change history is 1.8, and that number is the failed ERP implementation still shaping how faculty read any technology project.",
+      ),
+    ],
+    "Kotter over ADKAR, and why the adaptation matters more": [
+      f(
+        "course-eval-training-cascade",
+        1094,
+        489,
+        "dark",
+        "Three tier training cascade model. Tier one, a two day intensive workshop for 15 to 20 faculty champions. Tier two, a half day hands-on session for 60 to 80 department representatives. Tier three, 30 minutes of self-paced online training for all 3,200 faculty, with depth of knowledge decreasing and reach increasing across the tiers.",
+        "Why the cascade rather than centralised training. A department chair demonstrating the dashboard in a faculty meeting is more credible than a consultant running a session, so the champion tier is taught the objections as well as the software.",
+      ),
+    ],
+    "Resistance is not one problem": [
+      f(
+        "course-eval-resistance-segments",
+        1320,
+        718,
+        "dark",
+        "Three resistance segments side by side: 30 percent opposed faculty, 50 percent undecided faculty and 60 percent disengaged students, each with its current belief, the target belief and the method for shifting it, followed by a note naming the neutral group as the conversion priority.",
+        "Resistance split into segments with different beliefs and therefore different methods. The note at the bottom is the strategy: the undecided middle is the swing group, and if it is not moved the opposing group's narrative becomes the default.",
+      ),
+      f(
+        "course-eval-resistance-conversion",
+        1238,
+        818,
+        "dark",
+        "Conversion plan for the same three segments, each with a root cause, a list of specific actions, a target and a measure. Opposed faculty is rooted in fear of surveillance and prior ERP trauma, undecided faculty in inertia, and disengaged students in a belief that feedback does not matter.",
+        "The same three segments turned into commitments with measures attached. The root cause row is the part that changes behaviour: fear of surveillance is answered by a co-authored privacy policy and a written guarantee, not by better messaging.",
       ),
     ],
     "Hybrid delivery, and where the boundary sits": [
@@ -1420,6 +1550,56 @@ const FIGURES: Record<string, Record<string, BlogFigure[]>> = {
         "The reframe the project turned on. The office saw a technology problem and solved it three times. Students were asking where they could park, how far it was and what it cost, and the portal answered none of those until after something had gone wrong.",
       ),
     ],
+    "Seven interviews, nineteen surveys, two walkthroughs": [
+      f(
+        "parking-empathy-map",
+        1456,
+        1588,
+        "light",
+        "Empathy map for the composite parking permit user, divided into what students think and feel, hear, see, and say and do, with pains and gains beneath. Pains include permit names serving administrative categories rather than students, holds appearing at the worst possible moment, international students being structurally excluded and appeals being inaccessible without a printer.",
+        "The four methods reduced to one composite student. The Hear quadrant is the one that reframed the appeal problem: students were being told by other students not to bother appealing, which is how an 18% success rate becomes a self-fulfilling figure.",
+      ),
+    ],
+    "Five themes from the research": [
+      f(
+        "parking-personas",
+        1284,
+        867,
+        "light",
+        "Three persona cards. Maria the daily commuter, aged 21, junior, commuting 45 minutes and working part time. Wei the international student, aged 23, a first year masters student newly arrived with no US plates. Jasmine the financial aid student, aged 20, a sophomore on financial aid working 15 hours a week. Each lists background, goals, frustrations and a quote.",
+        "The three segments that surfaced most consistently. Wei's card contains the structural exclusion: no US plates yet, and a required plate field with no alternative, which blocked roughly 4,000 students a year on a form validation rule.",
+      ),
+    ],
+    "Reframing, and the question that reorganised the problem": [
+      f(
+        "parking-design-challenge",
+        1531,
+        1023,
+        "light",
+        "Design challenge overview titled making parking simple, fast and fair for students, with six panels: choose the right permit based on needs and budget, see lots on a map before choosing, check eligibility early to avoid last minute issues, appeal in five minutes from a phone, payment and access support with flexible options, and reduce support load through faster self-service.",
+        "The problem restated as six outcomes rather than six features. Framing the last panel as reducing support load is what let the redesign be argued in the Parking Office's own terms as well as the students'.",
+      ),
+    ],
+    "Thirty-eight ideas from three techniques": [
+      f(
+        "parking-hmw-tree",
+        1447,
+        1257,
+        "light",
+        "How Might We question tree with the core problem at the top and five columns beneath, one per question, covering permit selection, lot locations, surfacing holds early, the appeal process and equity for diverse student populations, each column listing its generated ideas and an idea count.",
+        "Thirty-eight ideas organised by the question that produced them, with counts per column. Laying it out this way is how you check that ideation covered the problem rather than circling the most interesting part of it.",
+      ),
+    ],
+    "Five concepts, scored against criteria set in advance": [
+      f(
+        "parking-storyboard",
+        1433,
+        782,
+        "light",
+        "Eight step solution storyboard for the selected concept: login with an account scan for holds, readiness check with resolution links, wizard questions, permit recommendation in plain language, lot preview with map and walk time, payment with no surprise holds, confirmation, and appeal with an online form and status tracker.",
+        "The selected concept as an eight step sequence. Steps one and two are the hold dashboard that scored equally with the wizard and was folded into it as step zero rather than shipped separately.",
+      ),
+    ],
     "Three rounds at rising fidelity, and the $110 that saved $12,000": [
       f(
         "parking-prototype",
@@ -1428,6 +1608,14 @@ const FIGURES: Record<string, Record<string, BlogFigure[]>> = {
         "light",
         "Four mobile screens from the high fidelity prototype: a question asking who the student is parking as, a permit recommendation list written in plain language, a lot selection screen with a map, and a payment confirmation.",
         "The permit flow from the high-fidelity round. Look at the permit names: plain language, not the eight internal codes. That rename was a spreadsheet edit with no code behind it, and it drove the largest single improvement in the project.",
+      ),
+      f(
+        "parking-appeal-prototype",
+        623,
+        1278,
+        "light",
+        "Four mobile screens from the citation appeal prototype: selecting a citation to appeal, choosing a reason from a pre-listed set, adding photographic evidence directly in the browser, and reviewing and submitting with an expected decision date.",
+        "The appeal flow that replaced print, scan and email. The evidence step is the unplanned win: structured submissions with photographs produced clearer cases, and the appeal success rate rose from 18% to 31% without any change to the decision criteria.",
       ),
     ],
     "What the pilot produced": [
@@ -1443,6 +1631,34 @@ const FIGURES: Record<string, Record<string, BlogFigure[]>> = {
   },
 
   "invoice-automation-governance": {
+    "Three structural problems, and one that matters more": [
+      f(
+        "invoice-current-state",
+        1368,
+        659,
+        "dark",
+        "Current state panel for accounts payable invoice processing in three groups: performance failures including a five day cycle time, a three percent error rate and twelve dollars per invoice across eight full time staff; structural problems including three intake channels, 47 routing rules and no standardised format; and institutional context including the prior automation failure and audit traceability requirements. An arrow runs from five days, three percent error and eight staff to two days, half a percent error and 80 percent straight-through processing.",
+        "The baseline and the target in one panel. The third column is the one that governs the plan: prior automation failed, staff fear job loss, and an ERP upgrade lands in 18 months.",
+      ),
+      f(
+        "invoice-strategic-alignment",
+        1412,
+        601,
+        "dark",
+        "Strategic alignment diagram for the automation pilot linking to three priorities, operational efficiency with three to four staff redeployed, compliance and control with a consistent audit trail, and ERP readiness with data for the upgrade scope, above an investment line of 250 thousand dollars with a twelve month return target.",
+        "Three reasons to fund it, and the third is the one that survives the obvious objection. Even if the ERP upgrade ships native automation on schedule, the pilot produces the process documentation and exception design that the upgrade would otherwise have to discover.",
+      ),
+    ],
+    "The scope boundary was the most important decision": [
+      f(
+        "invoice-charter",
+        1498,
+        272,
+        "dark",
+        "Project charter card with three panels: the project identifier for accounts payable invoice approval automation, a timeline of twelve weeks to proof of concept and twenty weeks to pilot with a twelve month return target, and a budget and scope line of 250 thousand dollars covering a two department pilot of three-way match invoices under five thousand dollars.",
+        "The charter in three boxes, and the third box is the scope boundary. Two departments, three-way match, under five thousand dollars: the segment where automation is reliable enough to succeed while still covering 70% of volume.",
+      ),
+    ],
     "The prior failure, reconstructed and mapped": [
       f(
         "invoice-prior-failure",
@@ -1463,6 +1679,24 @@ const FIGURES: Record<string, Record<string, BlogFigure[]>> = {
         "2.2 out of 5 is what the governance had to be designed for, not what it ought to be. Risk management at 1.5 is the alarming one for an automation project, because a bot applies a flawed rule 7,000 times a month rather than 300.",
       ),
     ],
+    "Fewer stakeholders, higher intensity": [
+      f(
+        "invoice-stakeholder-grid",
+        1235,
+        917,
+        "dark",
+        "Stakeholder power and interest grid with four quadrants. Manage closely holds the CFO as sponsor, internal audit, the accounts payable manager and pilot department heads. Keep satisfied holds the IT director and the ERP upgrade team. Keep informed holds the accounts payable team of eight, the automation vendor and suppliers. Monitor holds legal, procurement and non-pilot departments. A note records that the accounts payable team sits in keep informed by formal power but is treated as manage closely because of its influence on adoption.",
+        "The note under the grid is the useful part. The accounts payable team holds almost no formal authority and complete practical veto over whether the thing gets used, and formal authority is not the same as influence.",
+      ),
+      f(
+        "invoice-stakeholder-actions",
+        1498,
+        1264,
+        "dark",
+        "Four stakeholder panels, each pairing a current belief with a target belief and a list of actions. The accounts payable team's fear of replacement is answered with a role in exception mapping, defined redeployment and an upskilling plan. Internal audit's concern about new fraud vectors is answered with incremental review and co-designed detection rules. The sponsor's need for visible return is answered with a dashboard and a public redeployment commitment. The ERP team's watching posture is answered with shared pilot data and joint planning. A note records that 70 percent of stakeholder effort falls in the first eight weeks.",
+        "Each group's actual belief, the belief the project needs, and what would move it. The note at the bottom is the sequencing decision: most of this work happens before week eight, because building support after the bot is configured is the same mistake as testing after development.",
+      ),
+    ],
     "Decision rights, and three assignments worth defending": [
       f(
         "invoice-governance-tiers",
@@ -1479,6 +1713,88 @@ const FIGURES: Record<string, Record<string, BlogFigure[]>> = {
         "dark",
         "RACI matrix across project decision areas and seven roles, marking who is responsible, accountable, consulted and informed for each, with exactly one accountable role per row.",
         "Exactly one A per row, which means exactly one person can be asked why something happened. The three worth defending: the accounts payable manager is accountable for exception design, internal audit is consulted rather than informed, and the CFO is informed on architecture rather than consulted.",
+      ),
+      f(
+        "invoice-raci-detail",
+        1564,
+        979,
+        "light",
+        "Expanded RACI matrix broken down by project phase, from initiation and discovery through build and proof of concept, pilot and transition, assigning responsible, accountable, consulted and informed roles to each task within every phase.",
+        "The same assignments at task level, phase by phase. Reading down a single column shows how one role's involvement rises and falls, which is what makes the half-time and 20% allocations in the resource plan defensible rather than optimistic.",
+      ),
+    ],
+    "Escalation thresholds set deliberately low": [
+      f(
+        "invoice-escalation",
+        1498,
+        710,
+        "dark",
+        "Three escalation tiers with quantified triggers. Tier one execution resolves technical configuration and vendor questions same day. Tier two governance takes schedule slips beyond one week, cost variance above five percent, audit flags unresolved beyond five days or rising staff resistance, resolving within 48 hours. Tier three sponsor takes schedule slips beyond two weeks, cost variance above ten percent or scope change above five thousand dollars. A note explains that low thresholds compensate for weak monitoring maturity.",
+        "Triggers as numbers rather than judgement calls. The note is the reasoning: a level two organisation cannot detect slow-developing problems, so by the time a two week slip is visible it may already be four, and low thresholds buy false alarms instead.",
+      ),
+    ],
+    "Two gates, and why 70% becomes 80%": [
+      f(
+        "invoice-wbs",
+        1529,
+        903,
+        "light",
+        "Work breakdown structure for the automation pilot decomposed into five phases, initiation, discovery, build and proof of concept, pilot and transition, containing twenty work packages, with key critical path dependencies listed beneath.",
+        "Five phases, twenty packages. The dependency list at the bottom is what the two gates enforce: rule extraction has to finish before bot development starts, and both testing and audit trail configuration have to close before the first department goes live.",
+      ),
+      f(
+        "invoice-schedule",
+        1441,
+        1287,
+        "light",
+        "Gantt chart of the twenty week project schedule with the critical path highlighted, showing initiation, discovery, build and proof of concept, pilot and transition phases, with the week twelve proof of concept gate and week twenty pilot gate marked as milestones.",
+        "Twenty weeks with the critical path picked out. Discovery and build overlap from week six, which saves about two weeks against running them in sequence, and the two department go-lives are staggered by three weeks so real exceptions surface before scope expands.",
+      ),
+      f(
+        "invoice-timeline",
+        1767,
+        1240,
+        "light",
+        "Project timeline showing the two phases against week numbers, with six two week sprints marked across bot development and configuration, and the week twelve and week twenty gates drawn as vertical decision points.",
+        "The same twenty weeks showing where the sprints sit. This is the hybrid model in one picture: sprints inside the phases, hard gates between them, and the gate dates fixed regardless of sprint velocity.",
+      ),
+      f(
+        "invoice-budget",
+        1564,
+        914,
+        "light",
+        "Budget allocation for 250 thousand dollars shown as a donut chart with a line item breakdown: software and licensing 105 thousand at 42 percent, integration and development 80 thousand at 32 percent, training and change management 25 thousand at 10 percent, and project management with contingency 40 thousand at 16 percent including 15 thousand earmarked for ERP reconfiguration.",
+        "Integration takes 32% because underfunding integration is what broke the last attempt. The contingency line carries 15 thousand ring-fenced for reconfiguring the bots after the ERP upgrade, which is a cost the project knows is coming.",
+      ),
+    ],
+    "Change management, and the promise that had to be in writing": [
+      f(
+        "invoice-comms-plan",
+        1560,
+        1297,
+        "light",
+        "Communication plan table grouped into weekly execution, governance decision making, compliance audit trail, milestone one-time events and escalation, listing audience, frequency, channel, owner and content for each, with an escalation trigger panel requiring CFO notification within 24 hours for critical path slips, budget variance above ten percent, scope changes and audit findings.",
+        "Who hears what, how often, from whom. The weekly accounts payable update is the one that matters most: its standing content is the redeployment commitment, repeated every week by the manager rather than announced once by the sponsor.",
+      ),
+    ],
+    "Quality, and rejecting risk-based testing": [
+      f(
+        "invoice-kpis",
+        1164,
+        790,
+        "light",
+        "Key performance indicator table listing invoice cycle time, straight-through processing rate, error rate, audit compliance score, return on investment, staff adoption rate and exception rate, each with a baseline, a target, a measurement method and a reporting frequency.",
+        "Seven indicators, each with a stated measurement method rather than just a target. Staff adoption sits in the same table as cycle time and error rate, which is what makes it a gate criterion instead of a sentiment.",
+      ),
+    ],
+    "The handoff that broke last time": [
+      f(
+        "invoice-handoff",
+        1767,
+        1122,
+        "light",
+        "Operational handoff sequence across four steps from runbooks delivered in week eighteen through shadowing in weeks nineteen and twenty, a four week hypercare period, and formal close with a signed acceptance document. Below it, three steady-state support tiers covering daily operations, bot maintenance and major enhancements with response times, plus ERP upgrade support and three risk mitigation measures.",
+        "The transition designed rather than assumed, because this is exactly where the last automation broke. Operations shadows the project team before owning it, hypercare runs four weeks past handoff, and nothing closes until an acceptance document is signed.",
       ),
     ],
   },
