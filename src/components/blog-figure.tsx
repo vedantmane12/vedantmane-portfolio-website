@@ -56,12 +56,20 @@ export function BlogFigureBlock({
         />
 
         {/* Sits on the figure's own surface, so it has to contrast against
-            whichever tone that is. */}
+            whichever tone that is.
+
+            Always visible where there is no hover. Revealing this on hover alone
+            hid it permanently on touch, which is the worst place to hide it: a
+            phone renders these diagrams about 310px wide, so opening the full
+            file is the only way to read one, and that was the single most
+            important control on the page with no affordance at all. */}
         <span
           className={cn(
             "pointer-events-none absolute right-3 top-3 rounded-full px-2.5 py-1",
             "font-mono text-[10px] uppercase tracking-[0.14em]",
-            "opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100",
+            "opacity-0 transition-opacity duration-300",
+            "group-hover:opacity-100 group-focus-visible:opacity-100",
+            "[@media(hover:none)]:opacity-100",
             figure.tone === "light"
               ? "bg-black/75 text-white"
               : "bg-white/85 text-black",
