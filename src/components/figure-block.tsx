@@ -1,9 +1,10 @@
 import Image from "next/image";
-import type { BlogFigure } from "@/content/blog";
+import type { Figure } from "@/lib/figure";
 import { cn } from "@/lib/utils";
 
 /**
- * A figure from the original analysis, framed and captioned.
+ * A figure from the work itself, framed and captioned. Used by both the
+ * writing pages and the project pages.
  *
  * Three decisions worth recording.
  *
@@ -23,11 +24,11 @@ import { cn } from "@/lib/utils";
  * JavaScript, it hands the reader their own pinch-zoom, and the caption states
  * the takeaway so the argument survives without opening anything.
  */
-export function BlogFigureBlock({
+export function FigureBlock({
   figure,
   index,
 }: {
-  figure: BlogFigure;
+  figure: Figure;
   index: number;
 }) {
   return (

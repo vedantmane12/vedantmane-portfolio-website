@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { CONTENT_REVISED, postsByDate } from "@/content/blog";
+import { projectDetails } from "@/content/project-details";
 import { projects, SITE_URL } from "@/content/site";
 import { projectImageSrc } from "@/lib/project-media";
 
@@ -34,11 +35,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: PROJECTS_UPDATED,
       changeFrequency: "yearly" as const,
       priority: project.featured ? 0.9 : 0.7,
-      // Declaring the card photograph gives Google Images something to attach
-      // to the page. Costs one line per project and is the only way these
-      // images get discovered, since they are CSS backgrounds on the detail
-      // page rather than content <img> elements.
-      images: [`${SITE_URL}${projectImageSrc(project.slug)}`],
+      // The card photograph plus any figures the project has. The photograph
+      // needs declaring because it is a CSS background on the detail page rather
+      // than a content <img>, so nothing else would discover it. The figures are
+      // real <img> elements, and they are here because the IMDb dashboards are
+      // the only screenshots on the site showing a built interface.
+      images: [
+        `${SITE_URL}${projectImageSrc(project.slug)}`,
+        ...(projectDetails[project.slug]?.figures ?? []).map(
+          (figure) => `${SITE_URL}${figure.src}`,
+        ),
+      ],
     })),
     {
       url: `${SITE_URL}/blog`,

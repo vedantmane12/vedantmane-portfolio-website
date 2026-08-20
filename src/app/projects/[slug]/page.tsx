@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArchitectureDiagram } from "@/components/architecture-diagram";
+import { FigureBlock } from "@/components/figure-block";
 import { Footer } from "@/components/footer";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
 import { ScrollProgress } from "@/components/motion/scroll-progress";
@@ -320,6 +321,47 @@ export default async function ProjectPage({ params }: Params) {
                   </RevealGroup>
                 </div>
               </section>
+
+              {/* What it produced. Only rendered where the project has something
+                  to show: most of these are pipelines whose output is a table,
+                  not a screen, so an empty gallery would be worse than none. */}
+              {detail.figures && detail.figures.length > 0 && (
+                <section className="hairline py-20 sm:py-24">
+                  <div className="container-page">
+                    <Reveal>
+                      <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-highlight">
+                        What it produced
+                      </p>
+                    </Reveal>
+                    <Reveal delay={0.06}>
+                      <h2 className="mt-5 text-[clamp(1.6rem,3.4vw,2.4rem)] font-medium tracking-[-0.03em]">
+                        {detail.figures.length === 1
+                          ? "The dashboard"
+                          : `${detail.figures.length} dashboards on the warehouse`}
+                      </h2>
+                    </Reveal>
+
+                    {/* Screenshots are captured with filters applied, so the
+                        headline tiles read as a selection rather than a total.
+                        Saying so beats letting a number look like a claim. */}
+                    <Reveal delay={0.1}>
+                      <p className="mt-5 max-w-2xl text-pretty leading-relaxed text-muted">
+                        Captured with genre filters active, so the tiles show
+                        the selected slice rather than the full catalogue. Open
+                        any figure at full size to read it.
+                      </p>
+                    </Reveal>
+
+                    <div className="mt-4">
+                      {detail.figures.map((figure, i) => (
+                        <Reveal key={figure.src} delay={0.04 * i}>
+                          <FigureBlock figure={figure} index={i + 1} />
+                        </Reveal>
+                      ))}
+                    </div>
+                  </div>
+                </section>
+              )}
 
               {/* Decisions */}
               <section className="hairline py-20 sm:py-24">

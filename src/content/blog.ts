@@ -1,3 +1,5 @@
+import type { Figure } from "@/lib/figure";
+
 /**
  * Writing: process engineering case studies.
  *
@@ -23,30 +25,10 @@
  */
 
 /**
- * A figure lifted from the original analysis: BPMN models, journey maps,
- * fishbone diagrams, risk matrices, prototype screens.
- *
- * `width` and `height` are the real pixel dimensions of the asset, so the page
- * reserves the right box and never shifts on load, and so the component can
- * refuse to upscale a figure past its native size. Several of these were
- * embedded in the source PDFs at modest resolution and go blurry if stretched.
- *
- * `tone` is measured, not guessed: it comes from the mean luminance of the
- * processed file. It decides which way the frame and the zoom affordance need
- * to contrast, since roughly a third of these figures were authored dark and
- * the rest light.
+ * Figures for the writing. The shape lives in `@/lib/figure` because the project
+ * pages use the same one; this alias keeps the local name readable.
  */
-export type BlogFigure = {
-  /** Path under /public. */
-  src: string;
-  width: number;
-  height: number;
-  /** Describes what the figure contains, for screen readers and for search. */
-  alt: string;
-  /** Visible caption. Says what to look for rather than restating the alt. */
-  caption: string;
-  tone: "light" | "dark";
-};
+export type BlogFigure = Figure;
 
 export type BlogSection = {
   heading: string;

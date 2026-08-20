@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { BlogFigureBlock } from "@/components/blog-figure";
+import { FigureBlock } from "@/components/figure-block";
 import { Footer } from "@/components/footer";
 import { Reveal } from "@/components/motion/reveal";
 import { ScrollProgress } from "@/components/motion/scroll-progress";
@@ -316,7 +316,7 @@ export default async function BlogPost({ params }: Params) {
                     className="mx-auto max-w-3xl lg:max-w-5xl"
                   >
                     <Reveal>
-                      <BlogFigureBlock
+                      <FigureBlock
                         figure={figure}
                         index={figureNumber(figure.src)}
                       />
