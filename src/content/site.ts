@@ -306,8 +306,8 @@ export const socials: Social[] = [
   },
   {
     label: "LinkedIn",
-    href: "https://www.linkedin.com/in/vedant-mane/",
-    handle: "in/vedant-mane",
+    href: "https://www.linkedin.com/in/vedant-vm/",
+    handle: "in/vedant-vm",
     icon: "linkedin",
   },
   {
